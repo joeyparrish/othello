@@ -56,26 +56,31 @@ circle {
   stroke-width: 1px;  /* In SVG coordinates, not page coordinates. */
 }
 
+.valid circle.inner {
+  fill: gray;
+  stroke: lightgray;
+}
+
 rect {
   fill: none;
   stroke: none;
 }
 
-.black circle {
+.black circle.outer {
   fill: black;
   stroke: white;
 }
 
-.white circle {
+.white circle.outer {
   fill: white;
   stroke: black;
 }
 
-.black.flip circle {
+.black.flip circle.outer {
   animation: flip-black 1s ease-in-out;
 }
 
-.white.flip circle {
+.white.flip circle.outer {
   animation: flip-white 1s ease-in-out;
 }
 

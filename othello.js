@@ -1,6 +1,6 @@
 const grid = [];
-let turn = 'white';
 const scoreElements = {};
+let turn = 'white';
 
 function init() {
   const peer = new Peer();
@@ -13,6 +13,7 @@ function init() {
   setupBoard();
   takeScore();
   scoreElements[turn].stone.classList.add('last');
+  markValidMoves();
 }
 
 function createStone() {
@@ -21,6 +22,7 @@ function createStone() {
   svg.setAttributeNS(null, 'viewBox', '0 0 100 100');
 
   const circle = document.createElementNS(xmlns, 'circle');
+  circle.classList.add('outer');
   circle.setAttributeNS(null, 'cx', '50');
   circle.setAttributeNS(null, 'cy', '50');
   circle.setAttributeNS(null, 'r', '45');
@@ -32,6 +34,13 @@ function createStone() {
   rect.setAttributeNS(null, 'width', '20');
   rect.setAttributeNS(null, 'height', '20');
   svg.appendChild(rect);
+
+  const innerCircle = document.createElementNS(xmlns, 'circle');
+  innerCircle.classList.add('inner');
+  innerCircle.setAttributeNS(null, 'cx', '50');
+  innerCircle.setAttributeNS(null, 'cy', '50');
+  innerCircle.setAttributeNS(null, 'r', '20');
+  svg.appendChild(innerCircle);
 
   return svg;
 }
@@ -74,6 +83,7 @@ function setupBoard() {
       div.dataset.x = x;
       div.dataset.y = y;
       div.addEventListener('click', onClick);
+      div.addEventListener('animationend', markValidMoves);
       div.appendChild(createStone());
       window.board.appendChild(div);
       row.push(div);
@@ -105,6 +115,22 @@ function takeScore() {
     scoreElements[color].scoreSpan.textContent = scores[color];
     scoreElements[color].scoreSpan.classList.remove('animated-text');
     scoreElements[color].scoreSpan.classList.add('animated-text');
+  }
+}
+
+function markValidMoves() {
+  for (let y = 0; y < 8; ++y) {
+    for (let x = 0; x < 8; ++x) {
+      if (isValidPlay(x, y, turn)) {
+        grid[y][x].classList.add('valid');
+      }
+    }
+  }
+}
+
+function unmarkValidMoves() {
+  for (const div of window.board.querySelectorAll('.valid')) {
+    div.classList.remove('valid');
   }
 }
 
@@ -216,6 +242,7 @@ function onClick(event) {
   const {x, y} = div.dataset;
   const ok = playStone(parseInt(x), parseInt(y), turn);
   if (ok) {
+    unmarkValidMoves();
     scoreElements[turn].stone.classList.remove('last');
     turn = oppositeColor(turn);
     scoreElements[turn].stone.classList.add('last');
