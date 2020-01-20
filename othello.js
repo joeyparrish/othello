@@ -1,4 +1,7 @@
 const grid = [];
+let turn = 'white';
+let whiteScoreSpan;
+let blackScoreSpan;
 
 function init() {
   const peer = new Peer();
@@ -6,7 +9,55 @@ function init() {
     peer.id;
   });
 
+  setupScore();
   setupBoard();
+  takeScore();
+}
+
+function createStone() {
+  const xmlns = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(xmlns, 'svg');
+  svg.setAttributeNS(null, 'viewBox', '0 0 100 100');
+
+  const circle = document.createElementNS(xmlns, 'circle');
+  circle.setAttributeNS(null, 'cx', '50');
+  circle.setAttributeNS(null, 'cy', '50');
+  circle.setAttributeNS(null, 'r', '45');
+  svg.appendChild(circle);
+
+  return svg;
+}
+
+function setupScore() {
+  let span, innerSpan;
+
+  span = document.createElement('span');
+  span.classList.add('score-wrapper');
+  innerSpan = document.createElement('span');
+  span.appendChild(innerSpan);
+
+  innerSpan.classList.add('stone');
+  innerSpan.classList.add('black');
+  innerSpan.appendChild(createStone());
+
+  blackScoreSpan = document.createElement('span');
+  blackScoreSpan.classList.add('score-text');
+  span.appendChild(blackScoreSpan);
+  window.score.appendChild(span);
+
+  span = document.createElement('span');
+  span.classList.add('score-wrapper');
+  innerSpan = document.createElement('span');
+  span.appendChild(innerSpan);
+
+  innerSpan.classList.add('stone');
+  innerSpan.classList.add('white');
+  innerSpan.appendChild(createStone());
+
+  whiteScoreSpan = document.createElement('span');
+  whiteScoreSpan.classList.add('score-text');
+  span.appendChild(whiteScoreSpan);
+  window.score.appendChild(span);
 }
 
 function setupBoard() {
@@ -20,19 +71,8 @@ function setupBoard() {
       div.dataset['x'] = x;
       div.dataset['y'] = y;
       div.addEventListener('click', onClick);
-      board.appendChild(div);
-
-      const xmlns = 'http://www.w3.org/2000/svg';
-      const svg = document.createElementNS(xmlns, 'svg');
-      svg.setAttributeNS(null, 'viewBox', '0 0 100 100');
-      div.appendChild(svg);
-
-      const circle = document.createElementNS(xmlns, 'circle');
-      circle.setAttributeNS(null, 'cx', '50');
-      circle.setAttributeNS(null, 'cy', '50');
-      circle.setAttributeNS(null, 'r', '45');
-      svg.appendChild(circle);
-
+      div.appendChild(createStone());
+      window.board.appendChild(div);
       row.push(div);
     }
   }
@@ -41,6 +81,26 @@ function setupBoard() {
   grid[3][4].classList.add('black');
   grid[4][4].classList.add('white');
   grid[4][3].classList.add('black');
+}
+
+function takeScore() {
+  let blackTotal = 0;
+  let whiteTotal = 0;
+
+  for (let y = 0; y < 8; ++y) {
+    for (let x = 0; x < 8; ++x) {
+      if (grid[y][x].classList.contains('black')) {
+        blackTotal += 1;
+      }
+
+      if (grid[y][x].classList.contains('white')) {
+        whiteTotal += 1;
+      }
+    }
+  }
+
+  blackScoreSpan.textContent = blackTotal;
+  whiteScoreSpan.textContent = whiteTotal;
 }
 
 function *scanDirection(x, y, dx, dy, color) {
@@ -116,7 +176,7 @@ function isValidPlay(x, y, color) {
 function playStone(x, y, color) {
   if (!isValidPlay(x, y, color)) {
     console.log('invalid play', x, y, color);
-    return;
+    return false;
   }
 
   console.log('play', x, y, color);
@@ -135,12 +195,18 @@ function playStone(x, y, color) {
       }
     }
   }
+
+  return true;
 }
 
 function onClick(event) {
   const div = event.currentTarget;
   const {x, y} = div.dataset;
-  playStone(parseInt(x), parseInt(y), 'white');
+  const ok = playStone(parseInt(x), parseInt(y), turn);
+  if (ok) {
+    turn = oppositeColor(turn);
+    takeScore();
+  }
 }
 
 document.addEventListener('DOMContentLoaded', init);
