@@ -1,7 +1,6 @@
 const grid = [];
 let turn = 'white';
-let blackScoreSpan;
-let whiteScoreSpan;
+const scoreElements = {};
 
 function init() {
   const peer = new Peer();
@@ -9,10 +8,11 @@ function init() {
     peer.id;
   });
 
-  blackScoreSpan = setupScore('black');
-  whiteScoreSpan = setupScore('white');
+  scoreElements.black = setupScore('black');
+  scoreElements.white = setupScore('white');
   setupBoard();
   takeScore();
+  scoreElements[turn].stone.classList.add('last');
 }
 
 function createStone() {
@@ -39,23 +39,28 @@ function createStone() {
 function setupScore(color) {
   const span = document.createElement('span');
   span.classList.add('score-wrapper');
-  const innerSpan = document.createElement('span');
-  span.appendChild(innerSpan);
+  window.score.appendChild(span);
 
+  const innerSpan = document.createElement('span');
   innerSpan.classList.add('stone');
   innerSpan.classList.add(color);
-  innerSpan.appendChild(createStone());
+  span.appendChild(innerSpan);
+
+  const stone = createStone();
+  innerSpan.appendChild(stone);
 
   const scoreSpan = document.createElement('span');
   scoreSpan.classList.add('score-text');
   span.appendChild(scoreSpan);
-  window.score.appendChild(span);
 
   scoreSpan.addEventListener('animationend', () => {
     scoreSpan.classList.remove('animated-text');
   });
 
-  return scoreSpan;
+  return {
+    scoreSpan,
+    stone,
+  };
 }
 
 function setupBoard() {
@@ -66,8 +71,8 @@ function setupBoard() {
     for (let x = 0; x < 8; ++x) {
       const div = document.createElement('div');
       div.classList.add('square');
-      div.dataset['x'] = x;
-      div.dataset['y'] = y;
+      div.dataset.x = x;
+      div.dataset.y = y;
       div.addEventListener('click', onClick);
       div.appendChild(createStone());
       window.board.appendChild(div);
@@ -82,28 +87,25 @@ function setupBoard() {
 }
 
 function takeScore() {
-  let blackTotal = 0;
-  let whiteTotal = 0;
+  let scores = { black: 0, white: 0 };
 
   for (let y = 0; y < 8; ++y) {
     for (let x = 0; x < 8; ++x) {
       if (grid[y][x].classList.contains('black')) {
-        blackTotal += 1;
+        scores.black += 1;
       }
 
       if (grid[y][x].classList.contains('white')) {
-        whiteTotal += 1;
+        scores.white += 1;
       }
     }
   }
 
-  blackScoreSpan.textContent = blackTotal;
-  blackScoreSpan.classList.remove('animated-text');
-  blackScoreSpan.classList.add('animated-text');
-
-  whiteScoreSpan.textContent = whiteTotal;
-  whiteScoreSpan.classList.remove('animated-text');
-  whiteScoreSpan.classList.add('animated-text');
+  for (const color in scores) {
+    scoreElements[color].scoreSpan.textContent = scores[color];
+    scoreElements[color].scoreSpan.classList.remove('animated-text');
+    scoreElements[color].scoreSpan.classList.add('animated-text');
+  }
 }
 
 function *scanDirection(x, y, dx, dy, color) {
@@ -214,7 +216,9 @@ function onClick(event) {
   const {x, y} = div.dataset;
   const ok = playStone(parseInt(x), parseInt(y), turn);
   if (ok) {
+    scoreElements[turn].stone.classList.remove('last');
     turn = oppositeColor(turn);
+    scoreElements[turn].stone.classList.add('last');
     takeScore();
   }
 }
