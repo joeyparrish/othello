@@ -19,8 +19,8 @@ function setupBoard() {
       div.classList.add('square');
       div.dataset['x'] = x;
       div.dataset['y'] = y;
+      div.addEventListener('click', onClick);
       board.appendChild(div);
-      row.push(div);
 
       const xmlns = 'http://www.w3.org/2000/svg';
       const svg = document.createElementNS(xmlns, 'svg');
@@ -33,7 +33,7 @@ function setupBoard() {
       circle.setAttributeNS(null, 'r', '45');
       svg.appendChild(circle);
 
-      div.addEventListener('click', onClick);
+      row.push(div);
     }
   }
 
@@ -43,17 +43,23 @@ function setupBoard() {
   grid[4][3].classList.add('black');
 }
 
-function *iterateDirection(x, y, dx, dy, color) {
-  // Don't try to iterate in place!
-  if (!dx && !dy) {
-    return;
-  }
-
+function *scanDirection(x, y, dx, dy, color) {
   x += dx;
   y += dy;
 
   for (; y >= 0 && y <= 7 && x >= 0 && x <= 7; y += dy, x += dx) {
     yield grid[y][x];
+  }
+}
+
+function *allDirections() {
+  for (const dx of [-1, 0, 1]) {
+    for (const dy of [-1, 0, 1]) {
+      // Never yield direction [0, 0] (in place)
+      if (dx || dy) {
+        yield [dx, dy];
+      }
+    }
   }
 }
 
@@ -71,7 +77,7 @@ function oppositeColor(color) {
 
 function isValidInDirection(x, y, dx, dy, color) {
   let first = true;
-  for (const div of iterateDirection(x, y, dx, dy)) {
+  for (const div of scanDirection(x, y, dx, dy)) {
     if (first) {
       if (!isColor(div, oppositeColor(color))) {
         return false;
@@ -92,6 +98,10 @@ function isValidInDirection(x, y, dx, dy, color) {
 }
 
 function isValidPlay(x, y, color) {
+  if (!isEmpty(grid[y][x])) {
+    return false;
+  }
+
   for (const dx of [-1, 0, 1]) {
     for (const dy of [-1, 0, 1]) {
       if (isValidInDirection(x, y, dx, dy, color)) {
@@ -99,13 +109,11 @@ function isValidPlay(x, y, color) {
       }
     }
   }
+
   return false;
 }
 
 function playStone(x, y, color) {
-  x = parseInt(x);
-  y = parseInt(y);
-
   if (!isValidPlay(x, y, color)) {
     console.log('invalid play', x, y, color);
     return;
@@ -114,18 +122,16 @@ function playStone(x, y, color) {
   console.log('play', x, y, color);
   grid[y][x].classList.add(color);
 
-  for (const dx of [-1, 0, 1]) {
-    for (const dy of [-1, 0, 1]) {
-      if (isValidInDirection(x, y, dx, dy, color)) {
-        for (const div of iterateDirection(x, y, dx, dy)) {
-          if (isEmpty(div) || isColor(div, color)) {
-            break;
-          }
-
-          div.classList.add('flip');
-          div.classList.add(color);
-          div.classList.remove(oppositeColor(color));
+  for (const [dx, dy] of allDirections()) {
+    if (isValidInDirection(x, y, dx, dy, color)) {
+      for (const div of scanDirection(x, y, dx, dy)) {
+        if (isEmpty(div) || isColor(div, color)) {
+          break;
         }
+
+        div.classList.add('flip');
+        div.classList.add(color);
+        div.classList.remove(oppositeColor(color));
       }
     }
   }
@@ -134,14 +140,7 @@ function playStone(x, y, color) {
 function onClick(event) {
   const div = event.currentTarget;
   const {x, y} = div.dataset;
-
-  if (div.classList.contains('white') || div.classList.contains('black')) {
-    div.classList.add('flip');
-    div.classList.toggle('white');
-    div.classList.toggle('black');
-  } else {
-    playStone(x, y, 'white');
-  }
+  playStone(parseInt(x), parseInt(y), 'white');
 }
 
 document.addEventListener('DOMContentLoaded', init);
