@@ -1,7 +1,7 @@
 const grid = [];
 let turn = 'white';
-let whiteScoreSpan;
 let blackScoreSpan;
+let whiteScoreSpan;
 
 function init() {
   const peer = new Peer();
@@ -9,7 +9,8 @@ function init() {
     peer.id;
   });
 
-  setupScore();
+  blackScoreSpan = setupScore('black');
+  whiteScoreSpan = setupScore('white');
   setupBoard();
   takeScore();
 }
@@ -28,36 +29,26 @@ function createStone() {
   return svg;
 }
 
-function setupScore() {
-  let span, innerSpan;
-
-  span = document.createElement('span');
+function setupScore(color) {
+  const span = document.createElement('span');
   span.classList.add('score-wrapper');
-  innerSpan = document.createElement('span');
+  const innerSpan = document.createElement('span');
   span.appendChild(innerSpan);
 
   innerSpan.classList.add('stone');
-  innerSpan.classList.add('black');
+  innerSpan.classList.add(color);
   innerSpan.appendChild(createStone());
 
-  blackScoreSpan = document.createElement('span');
-  blackScoreSpan.classList.add('score-text');
-  span.appendChild(blackScoreSpan);
+  const scoreSpan = document.createElement('span');
+  scoreSpan.classList.add('score-text');
+  span.appendChild(scoreSpan);
   window.score.appendChild(span);
 
-  span = document.createElement('span');
-  span.classList.add('score-wrapper');
-  innerSpan = document.createElement('span');
-  span.appendChild(innerSpan);
+  scoreSpan.addEventListener('animationend', () => {
+    scoreSpan.classList.remove('animated-text');
+  });
 
-  innerSpan.classList.add('stone');
-  innerSpan.classList.add('white');
-  innerSpan.appendChild(createStone());
-
-  whiteScoreSpan = document.createElement('span');
-  whiteScoreSpan.classList.add('score-text');
-  span.appendChild(whiteScoreSpan);
-  window.score.appendChild(span);
+  return scoreSpan;
 }
 
 function setupBoard() {
@@ -100,7 +91,12 @@ function takeScore() {
   }
 
   blackScoreSpan.textContent = blackTotal;
+  blackScoreSpan.classList.remove('animated-text');
+  blackScoreSpan.classList.add('animated-text');
+
   whiteScoreSpan.textContent = whiteTotal;
+  whiteScoreSpan.classList.remove('animated-text');
+  whiteScoreSpan.classList.add('animated-text');
 }
 
 function *scanDirection(x, y, dx, dy, color) {
