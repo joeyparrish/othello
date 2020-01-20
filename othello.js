@@ -12,7 +12,7 @@ function init() {
   scoreElements.white = setupScore('white');
   setupBoard();
   takeScore();
-  scoreElements[turn].stone.classList.add('last');
+  scoreElements[turn].stone.classList.add('turn');
   markValidMoves();
 }
 
@@ -22,25 +22,18 @@ function createStone() {
   svg.setAttributeNS(null, 'viewBox', '0 0 100 100');
 
   const circle = document.createElementNS(xmlns, 'circle');
-  circle.classList.add('outer');
+  circle.classList.add('stone');
   circle.setAttributeNS(null, 'cx', '50');
   circle.setAttributeNS(null, 'cy', '50');
   circle.setAttributeNS(null, 'r', '45');
   svg.appendChild(circle);
 
-  const rect = document.createElementNS(xmlns, 'rect');
-  rect.setAttributeNS(null, 'x', '40');
-  rect.setAttributeNS(null, 'y', '40');
-  rect.setAttributeNS(null, 'width', '20');
-  rect.setAttributeNS(null, 'height', '20');
-  svg.appendChild(rect);
-
-  const innerCircle = document.createElementNS(xmlns, 'circle');
-  innerCircle.classList.add('inner');
-  innerCircle.setAttributeNS(null, 'cx', '50');
-  innerCircle.setAttributeNS(null, 'cy', '50');
-  innerCircle.setAttributeNS(null, 'r', '20');
-  svg.appendChild(innerCircle);
+  const indicator = document.createElementNS(xmlns, 'circle');
+  indicator.classList.add('indicator');
+  indicator.setAttributeNS(null, 'cx', '50');
+  indicator.setAttributeNS(null, 'cy', '50');
+  indicator.setAttributeNS(null, 'r', '20');
+  svg.appendChild(indicator);
 
   return svg;
 }
@@ -51,7 +44,7 @@ function setupScore(color) {
   window.score.appendChild(span);
 
   const innerSpan = document.createElement('span');
-  innerSpan.classList.add('stone');
+  innerSpan.classList.add('stone-container');
   innerSpan.classList.add(color);
   span.appendChild(innerSpan);
 
@@ -243,9 +236,9 @@ function onClick(event) {
   const ok = playStone(parseInt(x), parseInt(y), turn);
   if (ok) {
     unmarkValidMoves();
-    scoreElements[turn].stone.classList.remove('last');
+    scoreElements[turn].stone.classList.remove('turn');
     turn = oppositeColor(turn);
-    scoreElements[turn].stone.classList.add('last');
+    scoreElements[turn].stone.classList.add('turn');
     takeScore();
   }
 }
