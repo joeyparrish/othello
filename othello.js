@@ -26,6 +26,13 @@ function createStone() {
   circle.setAttributeNS(null, 'r', '45');
   svg.appendChild(circle);
 
+  const rect = document.createElementNS(xmlns, 'rect');
+  rect.setAttributeNS(null, 'x', '40');
+  rect.setAttributeNS(null, 'y', '40');
+  rect.setAttributeNS(null, 'width', '20');
+  rect.setAttributeNS(null, 'height', '20');
+  svg.appendChild(rect);
+
   return svg;
 }
 
@@ -176,7 +183,14 @@ function playStone(x, y, color) {
   }
 
   console.log('play', x, y, color);
-  grid[y][x].classList.add(color);
+  const playSquare = grid[y][x];
+  playSquare.classList.add(color);
+
+  const last = window.board.querySelector('.last');
+  if (last) {
+    last.classList.remove('last');
+  }
+  playSquare.classList.add('last');
 
   for (const [dx, dy] of allDirections()) {
     if (isValidInDirection(x, y, dx, dy, color)) {

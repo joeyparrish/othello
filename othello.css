@@ -14,10 +14,6 @@
 
   border: 1px solid black;
   box-sizing: border-box;
-
-  fill: none;
-  stroke: none;
-  stroke-width: 1px;  /* In SVG coordinates, not page coordinates. */
 }
 
 .score-wrapper {
@@ -54,6 +50,15 @@ svg {
 
 circle {
   transform-origin: 50% 50%;
+
+  fill: none;
+  stroke: none;
+  stroke-width: 1px;  /* In SVG coordinates, not page coordinates. */
+}
+
+rect {
+  fill: none;
+  stroke: none;
 }
 
 .black circle {
@@ -72,6 +77,10 @@ circle {
 
 .white.flip circle {
   animation: flip-white 1s ease-in-out;
+}
+
+.last rect {
+  fill: red;
 }
 
 @keyframes flip-white {
