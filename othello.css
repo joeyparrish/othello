@@ -51,19 +51,23 @@
   filter: drop-shadow(-1vmin 1vmin 1vmin blue);
 }
 
-.pass-container {
+.msg-container {
   position: absolute;
-  display: none;
+  display: inline-block;
   font-size: 3vmin;
   font-weight: bold;
 }
 
-.pass .pass-container {
-  display: inline-block;
+.black .msg-container {
+  color: white;
 }
 
-.black.pass {
-  color: white;
+.pass .msg-container:before {
+  content: "PASS";
+}
+
+.gameOver .turn .msg-container:before {
+  content: "WIN";
 }
 
 svg {

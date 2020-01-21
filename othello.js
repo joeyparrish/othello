@@ -3,7 +3,6 @@
 const grid = [];
 const scoreElements = {};
 let turn = 'white';
-let gameOver = false;
 
 function init() {
   const peer = new Peer();
@@ -54,10 +53,9 @@ function setupScore(color) {
   const stone = createStone();
   stoneContainer.appendChild(stone);
 
-  const passContainer = document.createElement('div');
-  passContainer.classList.add('pass-container');
-  passContainer.textContent = 'PASS';
-  stoneContainer.appendChild(passContainer);
+  const msgContainer = document.createElement('div');
+  msgContainer.classList.add('msg-container');
+  stoneContainer.appendChild(msgContainer);
 
   const scoreSpan = document.createElement('span');
   scoreSpan.classList.add('score-text');
@@ -125,8 +123,7 @@ function takeScore() {
 }
 
 function endGame() {
-  gameOver = true;
-  window.board.classList.add('gameOver');
+  document.body.classList.add('gameOver');
 
   const black = window.board.querySelectorAll('.black').length;
   const white = window.board.querySelectorAll('.white').length;
@@ -142,8 +139,12 @@ function endGame() {
   }
 }
 
+function isGameOver() {
+  return document.body.classList.contains('gameOver');
+}
+
 function markValidMoves() {
-  if (gameOver) {
+  if (isGameOver()) {
     return;
   }
 
@@ -180,6 +181,7 @@ function unmarkValidMoves() {
 }
 
 function nextTurn() {
+  scoreElements[turn].container.classList.remove('turn');
   turn = oppositeColor(turn);
   console.log('TURN', turn);
   scoreElements[turn].container.classList.add('turn');
@@ -289,7 +291,7 @@ function playStone(x, y, color) {
 }
 
 function onClick(event) {
-  if (gameOver) {
+  if (isGameOver()) {
     return;
   }
 
@@ -298,7 +300,6 @@ function onClick(event) {
   const ok = playStone(parseInt(x), parseInt(y), turn);
   if (ok) {
     unmarkValidMoves();
-    scoreElements[turn].container.classList.remove('turn');
     nextTurn();
     takeScore();
   }

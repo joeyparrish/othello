@@ -2,3 +2,4 @@
 1.5 hour - keep score, take turns, animate score changes
 0.5 hour - add turn indicator, last stone indicator, valid move indicators
 0.5 hour - refactor indicators, add passing
+0.5 hour - add game over indicator/state
