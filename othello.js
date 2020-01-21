@@ -1,6 +1,9 @@
+'use strict';
+
 const grid = [];
 const scoreElements = {};
 let turn = 'white';
+let gameOver = false;
 
 function init() {
   const peer = new Peer();
@@ -12,7 +15,7 @@ function init() {
   scoreElements.white = setupScore('white');
   setupBoard();
   takeScore();
-  scoreElements[turn].stone.classList.add('turn');
+  scoreElements[turn].container.classList.add('turn');
   markValidMoves();
 }
 
@@ -32,7 +35,7 @@ function createStone() {
   indicator.classList.add('indicator');
   indicator.setAttributeNS(null, 'cx', '50');
   indicator.setAttributeNS(null, 'cy', '50');
-  indicator.setAttributeNS(null, 'r', '20');
+  indicator.setAttributeNS(null, 'r', '15');
   svg.appendChild(indicator);
 
   return svg;
@@ -43,13 +46,18 @@ function setupScore(color) {
   span.classList.add('score-wrapper');
   window.score.appendChild(span);
 
-  const innerSpan = document.createElement('span');
-  innerSpan.classList.add('stone-container');
-  innerSpan.classList.add(color);
-  span.appendChild(innerSpan);
+  const stoneContainer = document.createElement('span');
+  stoneContainer.classList.add('stone-container');
+  stoneContainer.classList.add(color);
+  span.appendChild(stoneContainer);
 
   const stone = createStone();
-  innerSpan.appendChild(stone);
+  stoneContainer.appendChild(stone);
+
+  const passContainer = document.createElement('div');
+  passContainer.classList.add('pass-container');
+  passContainer.textContent = 'PASS';
+  stoneContainer.appendChild(passContainer);
 
   const scoreSpan = document.createElement('span');
   scoreSpan.classList.add('score-text');
@@ -60,8 +68,8 @@ function setupScore(color) {
   });
 
   return {
+    container: stoneContainer,
     scoreSpan,
-    stone,
   };
 }
 
@@ -85,12 +93,12 @@ function setupBoard() {
 
   grid[3][3].classList.add('white');
   grid[3][4].classList.add('black');
-  grid[4][4].classList.add('white');
   grid[4][3].classList.add('black');
+  grid[4][4].classList.add('white');
 }
 
 function takeScore() {
-  let scores = { black: 0, white: 0 };
+  const scores = { black: 0, white: 0 };
 
   for (let y = 0; y < 8; ++y) {
     for (let x = 0; x < 8; ++x) {
@@ -109,9 +117,43 @@ function takeScore() {
     scoreElements[color].scoreSpan.classList.remove('animated-text');
     scoreElements[color].scoreSpan.classList.add('animated-text');
   }
+
+  if (scores.black + scores.white == 64) {
+    // Full board!
+    endGame();
+  }
+}
+
+function endGame() {
+  gameOver = true;
+  window.board.classList.add('gameOver');
+
+  const black = window.board.querySelectorAll('.black').length;
+  const white = window.board.querySelectorAll('.white').length;
+  if (black > white) {
+    scoreElements.white.container.classList.remove('turn');
+    scoreElements.black.container.classList.add('turn');
+  } else if (white > black) {
+    scoreElements.black.container.classList.remove('turn');
+    scoreElements.white.container.classList.add('turn');
+  } else {
+    scoreElements.black.container.classList.remove('turn');
+    scoreElements.white.container.classList.remove('turn');
+  }
 }
 
 function markValidMoves() {
+  if (gameOver) {
+    return;
+  }
+
+  if (window.board.querySelector('.black') == null ||
+      window.board.querySelector('.white') == null) {
+    // No pieces left!
+    endGame();
+    return;
+  }
+
   for (let y = 0; y < 8; ++y) {
     for (let x = 0; x < 8; ++x) {
       if (isValidPlay(x, y, turn)) {
@@ -119,12 +161,28 @@ function markValidMoves() {
       }
     }
   }
+
+  if (window.board.querySelector('.valid') == null) {
+    console.log('PASS', turn);
+    scoreElements[turn].container.classList.add('pass');
+    setTimeout(() => {
+      scoreElements[turn].container.classList.remove('pass');
+      nextTurn();
+      markValidMoves();
+    }, 1000);
+  }
 }
 
 function unmarkValidMoves() {
   for (const div of window.board.querySelectorAll('.valid')) {
     div.classList.remove('valid');
   }
+}
+
+function nextTurn() {
+  turn = oppositeColor(turn);
+  console.log('TURN', turn);
+  scoreElements[turn].container.classList.add('turn');
 }
 
 function *scanDirection(x, y, dx, dy, color) {
@@ -231,14 +289,17 @@ function playStone(x, y, color) {
 }
 
 function onClick(event) {
+  if (gameOver) {
+    return;
+  }
+
   const div = event.currentTarget;
   const {x, y} = div.dataset;
   const ok = playStone(parseInt(x), parseInt(y), turn);
   if (ok) {
     unmarkValidMoves();
-    scoreElements[turn].stone.classList.remove('turn');
-    turn = oppositeColor(turn);
-    scoreElements[turn].stone.classList.add('turn');
+    scoreElements[turn].container.classList.remove('turn');
+    nextTurn();
     takeScore();
   }
 }

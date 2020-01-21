@@ -23,9 +23,13 @@
 }
 
 .score-wrapper .stone-container {
-  display: inline-block;
   width: 10vmin;
   height: 10vmin;
+
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .score-text {
@@ -45,6 +49,21 @@
 
 .turn {
   filter: drop-shadow(-1vmin 1vmin 1vmin blue);
+}
+
+.pass-container {
+  position: absolute;
+  display: none;
+  font-size: 3vmin;
+  font-weight: bold;
+}
+
+.pass .pass-container {
+  display: inline-block;
+}
+
+.black.pass {
+  color: white;
 }
 
 svg {
