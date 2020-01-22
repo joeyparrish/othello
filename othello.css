@@ -79,9 +79,17 @@
   content: "TIE";
 }
 
+.bailed .msg-container:before {
+  content: "GONE";
+}
+
 .tie,
 .win {
   filter: drop-shadow(-1vmin 1vmin 1vmin red);
+}
+
+.bailed {
+  filter: drop-shadow(-1vmin 1vmin 1vmin green);
 }
 
 svg {

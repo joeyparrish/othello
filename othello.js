@@ -5,6 +5,7 @@ const scoreElements = {};
 let turn = 'white';
 let peer;
 let conn;
+let call;
 let remoteGame = false;
 let myColor;
 let stream;
@@ -37,8 +38,8 @@ function init() {
     if (event.keyCode == 13) {
       conn = peer.connect(window.joinPeer.value.trim());
       onConnection('white');
-      const call = peer.call(window.joinPeer.value.trim(), stream);
-      onCall(call);
+      call = peer.call(window.joinPeer.value.trim(), stream);
+      onCall();
     }
   });
 
@@ -72,9 +73,10 @@ async function setupRtc() {
     window.myId.value = peer.id;
   });
 
-  peer.on('call', (call) => {
+  peer.on('call', (callArg) => {
+    call = callArg;
     call.answer(stream);
-    onCall(call);
+    onCall();
   });
 
   peer.on('connection', (connArg) => {
@@ -82,11 +84,23 @@ async function setupRtc() {
     onConnection('black');
   });
 
-  peer.on('error', closeRtc);
+  peer.on('error', (error) => {
+    console.log('PEER ERROR', error);
+    closeRtc();
+  });
+
   window.muteButton.setAttribute('muted', friend.muted);
 }
 
 function closeRtc() {
+  if (conn) {
+    conn.close();
+  }
+
+  if (call) {
+    call.close();
+  }
+
   if (peer) {
     peer.destroy();
   }
@@ -110,6 +124,8 @@ function closeRtc() {
 
   window.remoteButton.classList.add('show');
   window.p2pContainer.classList.remove('show');
+
+  resetGame();
 }
 
 function createStone() {
@@ -242,6 +258,7 @@ function resetGame() {
     scoreElements[color].container.classList.remove('turn');
     scoreElements[color].container.classList.remove('win');
     scoreElements[color].container.classList.remove('tie');
+    scoreElements[color].container.classList.remove('bailed');
   }
 
   for (const div of window.board.querySelectorAll('.square')) {
@@ -447,11 +464,26 @@ function onConnection(color) {
   myColor = color;
   remoteGame = true;
   resetGame();
+
   conn.on('data', onRemoteData);
+  conn.on('close', () => {
+    console.log('CONN CLOSE');
+
+    for (const color in scoreElements) {
+      scoreElements[color].container.classList.remove('turn');
+      scoreElements[color].container.classList.remove('tie');
+      scoreElements[color].container.classList.remove('win');
+    }
+
+    scoreElements[oppositeColor(myColor)].container.classList.add('bailed');
+    document.body.classList.add('gameOver');
+    unmarkValidMoves();
+  });
+
   window.idContainer.classList.remove('show');
 }
 
-function onCall(call) {
+function onCall() {
   call.on('stream', (stream) => {
     window.friend.srcObject = stream;
   });
@@ -459,6 +491,7 @@ function onCall(call) {
 
 function onRemoteData(data) {
   console.log('REMOTE DATA', data);
+
   if (data.reset) {
     resetGame();
     return;

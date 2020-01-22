@@ -12,5 +12,6 @@
 0.5 hour - debugging RTC
 0.5 hour - fix RTC shut down, pass during remote play, zoom on mobile
 0.25 hour - fix button & border sizing, hide IDs once connected
+0.25 hour - fix connection close detection and indicate opponent bailed
 =========
-9.75 hours
+10.0 hours
