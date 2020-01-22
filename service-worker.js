@@ -24,6 +24,9 @@ async function install() {
 }
 
 async function updateCache(cache, request) {
+  // Disable the browser's cache, since we want control of updates ourselves.
+  request.cache = 'no-store';
+
   const response = await fetch(request);
   // Important: clone() is because cache.put consumes the response body!
   await cache.put(request, response.clone());
@@ -62,6 +65,8 @@ async function handleRequest(request) {
 }
 
 self.addEventListener('install', (event) => {
+  self.skipWaiting();  // Take over for any older service worker right away.
+
   event.waitUntil(install());
 });
 
