@@ -276,18 +276,22 @@ video#me {
   display: none;
 }
 
+#closeRtcButton,
 #muteButton {
   width: 5vmin;
   height: 5vmin;
   padding: 0;
 
   position: absolute;
-  bottom: 0;
-  left: 0;
 
   background-color: white;
   background-repeat: no-repeat;
   background-position: center center;
+}
+
+#muteButton {
+  bottom: 0;
+  left: 0;
 }
 
 #muteButton[muted=true] {
@@ -296,4 +300,11 @@ video#me {
 
 #muteButton[muted=false] {
   background-image: url(volume_up.svg);
+}
+
+#closeRtcButton {
+  top: 0;
+  right: 0;
+
+  background-image: url(close.svg);
 }

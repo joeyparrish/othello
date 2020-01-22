@@ -26,6 +26,27 @@ function init() {
     window.remoteButton.classList.add('show');
     window.remoteButton.addEventListener('click', setupRtc);
   }
+
+  window.myId.addEventListener('click', () => {
+    window.myId.select();
+    document.execCommand("copy");
+  });
+
+  window.joinPeer.addEventListener('keypress', (event) => {
+    if (event.keyCode == 13) {
+      conn = peer.connect(window.joinPeer.value.trim());
+      onConnection('white');
+      const call = peer.call(window.joinPeer.value.trim(), stream);
+      onCall(call);
+    }
+  });
+
+  window.muteButton.addEventListener('click', () => {
+    friend.muted = !friend.muted;
+    window.muteButton.setAttribute('muted', friend.muted);
+  });
+
+  window.closeRtcButton.addEventListener('click', closeRtc);
 }
 
 async function setupRtc() {
@@ -59,27 +80,23 @@ async function setupRtc() {
     onConnection('black');
   });
 
-  // TODO: Add peerjs error and disconnection event handlers
-
-  window.myId.addEventListener('click', () => {
-    window.myId.select();
-    document.execCommand("copy");
-  });
-
-  window.joinPeer.addEventListener('keypress', (event) => {
-    if (event.keyCode == 13) {
-      conn = peer.connect(window.joinPeer.value.trim());
-      onConnection('white');
-      const call = peer.call(window.joinPeer.value.trim(), stream);
-      onCall(call);
-    }
-  });
-
-  window.muteButton.addEventListener('click', () => {
-    friend.muted = !friend.muted;
-    window.muteButton.setAttribute('muted', friend.muted);
-  });
+  peer.on('error', closeRtc);
   window.muteButton.setAttribute('muted', friend.muted);
+}
+
+function closeRtc() {
+  peer = null;
+  conn = null;
+  remoteGame = false;
+  myColor = null;
+
+  window.myId.value = '';
+
+  window.friend.srcObject = null;
+  window.me.srcObject = null;
+
+  window.remoteButton.classList.add('show');
+  window.p2pContainer.classList.remove('show');
 }
 
 function createStone() {
