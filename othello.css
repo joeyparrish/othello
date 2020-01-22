@@ -66,8 +66,17 @@
   content: "PASS";
 }
 
-.gameOver .turn .msg-container:before {
+.win .msg-container:before {
   content: "WIN";
+}
+
+.tie .msg-container:before {
+  content: "TIE";
+}
+
+.tie,
+.win {
+  filter: drop-shadow(-1vmin 1vmin 1vmin red);
 }
 
 svg {
@@ -174,4 +183,14 @@ svg {
   100% {
     transform: scale(1, 1);
   }
+}
+
+button {
+  background-color: white;
+  border: black solid 1px;
+  border-radius: 4vmin;
+  height: 8vmin;
+  font-size: 5vmin;
+
+  margin: 4vmin;
 }

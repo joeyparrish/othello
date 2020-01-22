@@ -10,12 +10,12 @@ function init() {
     peer.id;
   });
 
-  scoreElements.black = setupScore('black');
-  scoreElements.white = setupScore('white');
-  setupBoard();
-  takeScore();
-  scoreElements[turn].container.classList.add('turn');
-  markValidMoves();
+  scoreElements.black = createScore('black');
+  scoreElements.white = createScore('white');
+  createBoard();
+  resetGame();
+
+  window.resetButton.addEventListener('click', resetGame);
 }
 
 function createStone() {
@@ -40,7 +40,7 @@ function createStone() {
   return svg;
 }
 
-function setupScore(color) {
+function createScore(color) {
   const span = document.createElement('span');
   span.classList.add('score-wrapper');
   window.score.appendChild(span);
@@ -71,7 +71,7 @@ function setupScore(color) {
   };
 }
 
-function setupBoard() {
+function createBoard() {
   for (let y = 0; y < 8; ++y) {
     const row = [];
     grid.push(row);
@@ -88,11 +88,6 @@ function setupBoard() {
       row.push(div);
     }
   }
-
-  grid[3][3].classList.add('white');
-  grid[3][4].classList.add('black');
-  grid[4][3].classList.add('black');
-  grid[4][4].classList.add('white');
 }
 
 function takeScore() {
@@ -124,23 +119,54 @@ function takeScore() {
 
 function endGame() {
   document.body.classList.add('gameOver');
+  scoreElements.white.container.classList.remove('turn');
+  scoreElements.black.container.classList.remove('turn');
 
   const black = window.board.querySelectorAll('.black').length;
   const white = window.board.querySelectorAll('.white').length;
+
   if (black > white) {
-    scoreElements.white.container.classList.remove('turn');
-    scoreElements.black.container.classList.add('turn');
+    scoreElements.black.container.classList.add('win');
   } else if (white > black) {
-    scoreElements.black.container.classList.remove('turn');
-    scoreElements.white.container.classList.add('turn');
+    scoreElements.white.container.classList.add('win');
   } else {
-    scoreElements.black.container.classList.remove('turn');
-    scoreElements.white.container.classList.remove('turn');
+    scoreElements.black.container.classList.add('tie');
+    scoreElements.white.container.classList.add('tie');
   }
 }
 
 function isGameOver() {
   return document.body.classList.contains('gameOver');
+}
+
+function resetGame() {
+  console.log('Resetting game');
+
+  document.body.classList.remove('gameOver');
+
+  for (const color in scoreElements) {
+    scoreElements[color].container.classList.remove('turn');
+    scoreElements[color].container.classList.remove('win');
+    scoreElements[color].container.classList.remove('tie');
+  }
+
+  for (const div of window.board.querySelectorAll('.square')) {
+    div.classList.remove('black');
+    div.classList.remove('white');
+    div.classList.remove('last');
+    div.classList.remove('flip');
+    div.classList.remove('valid');
+  }
+
+  grid[3][3].classList.add('white');
+  grid[3][4].classList.add('black');
+  grid[4][3].classList.add('black');
+  grid[4][4].classList.add('white');
+
+  turn = 'white';
+  takeScore();
+  scoreElements[turn].container.classList.add('turn');
+  markValidMoves();
 }
 
 function markValidMoves() {
@@ -181,6 +207,7 @@ function unmarkValidMoves() {
 }
 
 function nextTurn() {
+  unmarkValidMoves();
   scoreElements[turn].container.classList.remove('turn');
   turn = oppositeColor(turn);
   console.log('TURN', turn);
@@ -299,7 +326,6 @@ function onClick(event) {
   const {x, y} = div.dataset;
   const ok = playStone(parseInt(x), parseInt(y), turn);
   if (ok) {
-    unmarkValidMoves();
     nextTurn();
     takeScore();
   }
