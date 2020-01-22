@@ -24,10 +24,11 @@ function init() {
     resetGame();
   });
 
-  if (navigator.mediaDevices) {
-    window.remoteButton.classList.add('show');
-    window.remoteButton.addEventListener('click', setupRtc);
-  }
+  window.remoteButton.addEventListener('click', setupRtc);
+
+  window.addEventListener('online', onOnlineStatusChanged);
+  window.addEventListener('offline', onOnlineStatusChanged);
+  onOnlineStatusChanged();
 
   window.myId.addEventListener('click', () => {
     window.myId.select();
@@ -122,7 +123,8 @@ function closeRtc() {
   window.friend.srcObject = null;
   window.me.srcObject = null;
 
-  window.remoteButton.classList.add('show');
+  onOnlineStatusChanged();  // To compute whether to show the remote button
+
   window.p2pContainer.classList.remove('show');
 
   resetGame();
@@ -506,6 +508,20 @@ function onRemoteData(data) {
   if (ok) {
     nextTurn();
     takeScore();
+  }
+}
+
+function onOnlineStatusChanged() {
+  if (navigator.onLine) {
+    window.offlineRibbon.classList.remove('show');
+  } else {
+    window.offlineRibbon.classList.add('show');
+  }
+
+  if (navigator.mediaDevices && navigator.onLine && !peer) {
+    window.remoteButton.classList.add('show');
+  } else {
+    window.remoteButton.classList.remove('show');
   }
 }
 

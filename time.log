@@ -13,5 +13,6 @@
 0.5 hour - fix RTC shut down, pass during remote play, zoom on mobile
 0.25 hour - fix button & border sizing, hide IDs once connected
 0.25 hour - fix connection close detection and indicate opponent bailed
+0.5 hour - handle offline state and display corner ribbon
 =========
-10.0 hours
+10.5 hours

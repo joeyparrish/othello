@@ -1,3 +1,28 @@
+#offlineRibbon {
+  height: 4vmin;
+  font-size: 4vmin;
+  line-height: 4vmin;
+  vertical-align: middle;
+  text-align: center;
+
+  position: absolute;
+  width: 30vmin;
+  top: 7vmin;
+  left: -6vmin;
+
+  transform: rotate(-45deg);
+  transform-origin: center center;
+
+  background-color: red;
+  font-weight: bold;
+  color: white;
+  filter: drop-shadow(2px 4px 6px black);
+}
+
+#offlineRibbon:not(.show) {
+  display: none;
+}
+
 #board {
   display: grid;
   grid-template: repeat(8, 1fr) / repeat(8, 1fr);
