@@ -10,5 +10,6 @@
 1.0 hour - basic webrtc connections
 0.5 hour - remote play via p2p data
 0.5 hour - debugging RTC
+0.5 hour - fix RTC shut down, pass during remote play, zoom on mobile
 =========
-9.0 hours
+9.5 hours

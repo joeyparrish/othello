@@ -86,6 +86,16 @@ async function setupRtc() {
 }
 
 function closeRtc() {
+  if (peer) {
+    peer.destroy();
+  }
+
+  if (stream) {
+    for (const track of stream.getTracks()) {
+      track.stop();
+    }
+  }
+
   peer = null;
   conn = null;
   remoteGame = false;
@@ -257,14 +267,14 @@ function markValidMoves() {
     return;
   }
 
-  if (remoteGame && turn != myColor) {
-    return;
-  }
-
   if (window.board.querySelector('.black') == null ||
       window.board.querySelector('.white') == null) {
     // No pieces left!
     endGame();
+    return;
+  }
+
+  if (remoteGame && turn != myColor) {
     return;
   }
 
@@ -277,14 +287,21 @@ function markValidMoves() {
   }
 
   if (window.board.querySelector('.valid') == null) {
-    console.log('PASS', turn);
-    scoreElements[turn].container.classList.add('pass');
-    setTimeout(() => {
-      scoreElements[turn].container.classList.remove('pass');
-      nextTurn();
-      markValidMoves();
-    }, 1000);
+    if (remoteGame) {
+      conn.send({pass: true});
+    }
+    onPass();
   }
+}
+
+function onPass() {
+  console.log('PASS', turn);
+  scoreElements[turn].container.classList.add('pass');
+  setTimeout(() => {
+    scoreElements[turn].container.classList.remove('pass');
+    nextTurn();
+    markValidMoves();
+  }, 1000);
 }
 
 function unmarkValidMoves() {
@@ -442,6 +459,11 @@ function onRemoteData(data) {
   console.log('REMOTE DATA', data);
   if (data.reset) {
     resetGame();
+    return;
+  }
+
+  if (data.pass) {
+    onPass();
     return;
   }
 
