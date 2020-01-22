@@ -1,3 +1,9 @@
+#container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 #board {
   display: grid;
   grid-template: repeat(8, 1fr) / repeat(8, 1fr);
