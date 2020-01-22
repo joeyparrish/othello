@@ -6,6 +6,7 @@ let turn = 'white';
 let peer;
 let conn;
 let remoteGame = false;
+let myColor;
 
 function init() {
   scoreElements.black = createScore('black');
@@ -48,7 +49,7 @@ async function setupRtc() {
 
   peer.on('connection', (connArg) => {
     conn = connArg;
-    onConnection();
+    onConnection('black');
   });
 
   // TODO: Add peerjs error and disconnection event handlers
@@ -61,7 +62,7 @@ async function setupRtc() {
   window.joinPeer.addEventListener('keypress', (event) => {
     if (event.keyCode == 13) {
       conn = peer.connect(window.joinPeer.value.trim());
-      onConnection();
+      onConnection('white');
       const call = peer.call(window.joinPeer.value.trim(), stream);
       onCall(call);
     }
@@ -230,6 +231,10 @@ function markValidMoves() {
     return;
   }
 
+  if (remoteGame && turn != myColor) {
+    return;
+  }
+
   if (window.board.querySelector('.black') == null ||
       window.board.querySelector('.white') == null) {
     // No pieces left!
@@ -346,6 +351,10 @@ function playStone(x, y, color) {
     return false;
   }
 
+  if (remoteGame && color == myColor) {
+    conn.send({x, y, color});
+  }
+
   console.log('play', x, y, color);
   const playSquare = grid[y][x];
   playSquare.classList.add(color);
@@ -377,6 +386,9 @@ function onClick(event) {
   if (isGameOver()) {
     return;
   }
+  if (remoteGame && turn != myColor) {
+    return;
+  }
 
   const div = event.currentTarget;
   const {x, y} = div.dataset;
@@ -387,7 +399,8 @@ function onClick(event) {
   }
 }
 
-function onConnection() {
+function onConnection(color) {
+  myColor = color;
   remoteGame = true;
   resetGame();
   conn.on('data', onRemoteData);
@@ -401,6 +414,11 @@ function onCall(call) {
 
 function onRemoteData(data) {
   console.log('REMOTE DATA', data);
+  const ok = playStone(data.x, data.y, data.color);
+  if (ok) {
+    nextTurn();
+    takeScore();
+  }
 }
 
 document.addEventListener('DOMContentLoaded', init);
