@@ -9,6 +9,7 @@ let call;
 let remoteGame = false;
 let myColor;
 let stream;
+let passTimerId = null;
 
 function init() {
   scoreElements.black = createScore('black');
@@ -291,6 +292,10 @@ function markValidMoves() {
     return;
   }
 
+  if (passTimerId != null) {
+    return;
+  }
+
   if (window.board.querySelector('.black') == null ||
       window.board.querySelector('.white') == null) {
     // No pieces left!
@@ -321,7 +326,13 @@ function markValidMoves() {
 function onPass() {
   console.log('PASS', turn);
   scoreElements[turn].container.classList.add('pass');
-  setTimeout(() => {
+
+  if (passTimerId != null) {
+    clearTimeout(passTimerId);
+  }
+
+  passTimerId = setTimeout(() => {
+    passTimerId = null;
     scoreElements[turn].container.classList.remove('pass');
     nextTurn();
     markValidMoves();

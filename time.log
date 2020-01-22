@@ -16,5 +16,6 @@
 0.5 hour  - handle offline state and display corner ribbon
 0.5 hour  - add web app manifest and improve lighthouse scores
 0.5 hour  - add service worker
-==========
-11.5 hours
+0.25 hour - fix glitchy pass indicator
+===========
+11.75 hours
