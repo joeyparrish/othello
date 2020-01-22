@@ -25,7 +25,8 @@ async function install() {
 
 async function updateCache(cache, request) {
   const response = await fetch(request);
-  await cache.put(request, response);
+  // Important: clone() is because cache.put consumes the response body!
+  await cache.put(request, response.clone());
   return response;
 }
 
