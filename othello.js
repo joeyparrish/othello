@@ -50,6 +50,10 @@ function init() {
   });
 
   window.closeRtcButton.addEventListener('click', closeRtc);
+
+  if (navigator.serviceWorker) {
+    navigator.serviceWorker.register('service-worker.js');
+  }
 }
 
 async function setupRtc() {
@@ -518,7 +522,9 @@ function onOnlineStatusChanged() {
     window.offlineRibbon.classList.add('show');
   }
 
-  if (navigator.mediaDevices && navigator.onLine && !peer) {
+  // We have the peerjs library loaded, and we have a camera, and we're online,
+  // and we're not connected yet.
+  if (window.Peer && navigator.mediaDevices && navigator.onLine && !peer) {
     window.remoteButton.classList.add('show');
   } else {
     window.remoteButton.classList.remove('show');

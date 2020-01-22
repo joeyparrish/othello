@@ -15,5 +15,6 @@
 0.25 hour - fix connection close detection and indicate opponent bailed
 0.5 hour  - handle offline state and display corner ribbon
 0.5 hour  - add web app manifest and improve lighthouse scores
+0.5 hour  - add service worker
 ==========
-11.0 hours
+11.5 hours
