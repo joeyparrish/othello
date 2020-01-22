@@ -11,5 +11,6 @@
 0.5 hour - remote play via p2p data
 0.5 hour - debugging RTC
 0.5 hour - fix RTC shut down, pass during remote play, zoom on mobile
+0.25 hour - fix button & border sizing, hide IDs once connected
 =========
-9.5 hours
+9.75 hours

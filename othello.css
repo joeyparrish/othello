@@ -3,7 +3,7 @@
   grid-template: repeat(8, 1fr) / repeat(8, 1fr);
   width: 80vmin;
 
-  border: 1px solid black;
+  border: 0.15vmin solid black;
   box-sizing: border-box;
 }
 
@@ -12,8 +12,9 @@
   width: 10vmin;
   height: 10vmin;
 
-  border: 1px solid black;
+  border: 0.15vmin solid black;
   box-sizing: border-box;
+  line-height: 0; /* Fixes minor positioning weirdness for svg at zoom */
 }
 
 #score {
@@ -191,7 +192,7 @@ svg {
 
 button {
   background-color: white;
-  border: black solid 1px;
+  border: black solid 0.15vmin;
   border-radius: 4vmin;
   height: 8vmin;
   font-size: 5vmin;
@@ -212,7 +213,8 @@ button {
 }
 
 #gameContainer,
-#p2pContainer {
+#p2pContainer,
+#idContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -224,6 +226,10 @@ button {
 }
 
 #p2pContainer:not(.show) {
+  display: none;
+}
+
+#idContainer:not(.show) {
   display: none;
 }
 
@@ -287,6 +293,7 @@ video#me {
   background-color: white;
   background-repeat: no-repeat;
   background-position: center center;
+  background-size: 90%;
 }
 
 #muteButton {

@@ -65,6 +65,7 @@ async function setupRtc() {
 
   window.remoteButton.classList.remove('show');
   window.p2pContainer.classList.add('show');
+  window.idContainer.classList.add('show');
 
   peer = new Peer();
   peer.on('open', () => {
@@ -447,6 +448,7 @@ function onConnection(color) {
   remoteGame = true;
   resetGame();
   conn.on('data', onRemoteData);
+  window.idContainer.classList.remove('show');
 }
 
 function onCall(call) {
