@@ -1,11 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <script src="https://unpkg.com/peerjs@1.0.4/dist/peerjs.min.js"></script>
-    <script src="othello.js"></script>
-    <link rel="stylesheet" href="othello.css">
+    <title>Othello</title>
+
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Multi-player, browser-based, server-less Othello.  Can be played locally or P2P with video chat.">
+    <meta name="theme-color" content="#ffffff">
+
+    <link rel="stylesheet" href="othello.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
+    <script defer src="https://unpkg.com/peerjs@1.0.4/dist/peerjs.min.js"></script>
+    <!-- Don't defer this, or we get a flash of an incomplete page. -->
+    <script src="othello.js"></script>
   </head>
   <body>
     <div id="offlineRibbon">OFFLINE</div>

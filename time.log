@@ -1,18 +1,19 @@
 2.5 hours - initial board setup, flip animations, play validity, testing
-1.5 hour - keep score, take turns, animate score changes
-0.5 hour - add turn indicator, last stone indicator, valid move indicators
-0.5 hour - refactor indicators, add passing
-0.5 hour - add game over indicator/state
-0.5 hour - handle ties, add reset button
+1.5 hour  - keep score, take turns, animate score changes
+0.5 hour  - add turn indicator, last stone indicator, valid move indicators
+0.5 hour  - refactor indicators, add passing
+0.5 hour  - add game over indicator/state
+0.5 hour  - handle ties, add reset button
 0.25 hour - set up github repo
 0.25 hour - tweaking styles
-0.5 hour - add styles for landscape and portrait mode and add a video element
-1.0 hour - basic webrtc connections
-0.5 hour - remote play via p2p data
-0.5 hour - debugging RTC
-0.5 hour - fix RTC shut down, pass during remote play, zoom on mobile
+0.5 hour  - add styles for landscape and portrait mode and add a video element
+1.0 hour  - basic webrtc connections
+0.5 hour  - remote play via p2p data
+0.5 hour  - debugging RTC
+0.5 hour  - fix RTC shut down, pass during remote play, zoom on mobile
 0.25 hour - fix button & border sizing, hide IDs once connected
 0.25 hour - fix connection close detection and indicate opponent bailed
-0.5 hour - handle offline state and display corner ribbon
-=========
-10.5 hours
+0.5 hour  - handle offline state and display corner ribbon
+0.5 hour  - add web app manifest and improve lighthouse scores
+==========
+11.0 hours
