@@ -192,44 +192,104 @@ button {
   height: 8vmin;
   font-size: 5vmin;
 
-  margin: 4vmin;
   padding: 0 4vmin;
+}
+
+#resetButton,
+#remoteButton {
+  margin-top: 4vmin;
 }
 
 #appContainer {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
 }
 
 #gameContainer,
-#videoContainer {
+#p2pContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 }
 
-#inviteUrl {
+#p2pContainer {
+  margin-top: 4vmin;
+}
+
+#p2pContainer:not(.show) {
+  display: none;
+}
+
+label,
+input[type=text] {
+  font-size: 3vmin;
+}
+
+input[type=text] {
   width: 30vmin;
   margin-bottom: 5vmin;
 }
 
-video {
+#videoContainer {
+  position: relative;
+  line-height: 0;
+  margin-bottom: 2vmin;
+}
+
+video#friend {
   width: 40vmin;
   height: 40vmin;
   background-color: black;
 }
 
+video#me {
+  width: 10vmin;
+  height: 10vmin;
+  background-color: green;
+
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
 @media (orientation: portrait) {
   #appContainer {
     flex-direction: column;
+    align-items: center;
   }
 }
 
 @media (orientation: landscape) {
-  #videoContainer {
+  #p2pContainer {
     margin-left: 20vmin;
   }
+}
+
+#remoteButton:not(.show) {
+  display: none;
+}
+
+#muteButton {
+  width: 5vmin;
+  height: 5vmin;
+  padding: 0;
+
+  position: absolute;
+  bottom: 0;
+  left: 0;
+
+  background-color: white;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+#muteButton[muted=true] {
+  background-image: url(volume_off.svg);
+}
+
+#muteButton[muted=false] {
+  background-image: url(volume_up.svg);
 }

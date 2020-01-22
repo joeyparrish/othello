@@ -3,19 +3,75 @@
 const grid = [];
 const scoreElements = {};
 let turn = 'white';
+let peer;
+let conn;
+let remoteGame = false;
 
 function init() {
-  const peer = new Peer();
-  peer.on('open', () => {
-    peer.id;
-  });
-
   scoreElements.black = createScore('black');
   scoreElements.white = createScore('white');
   createBoard();
   resetGame();
 
   window.resetButton.addEventListener('click', resetGame);
+
+  if (navigator.mediaDevices) {
+    window.remoteButton.classList.add('show');
+    window.remoteButton.addEventListener('click', setupRtc);
+  }
+}
+
+async function setupRtc() {
+  const stream = await navigator.mediaDevices.getUserMedia({
+    video: {
+      width: 500,
+      height: 500,
+      facingMode: 'user',
+    },
+    audio: true,
+  });
+
+  window.me.muted = true;
+  window.me.srcObject = stream;
+
+  window.p2pContainer.classList.add('show');
+
+  peer = new Peer();
+  peer.on('open', () => {
+    window.myId.value = peer.id;
+  });
+
+  peer.on('call', (call) => {
+    call.answer(stream);
+    onCall(call);
+  });
+
+  peer.on('connection', (connArg) => {
+    conn = connArg;
+    onConnection();
+  });
+
+  // TODO: Add peerjs error and disconnection event handlers
+
+  window.myId.addEventListener('click', () => {
+    window.myId.select();
+    document.execCommand("copy");
+  });
+
+  window.joinPeer.addEventListener('keypress', (event) => {
+    if (event.keyCode == 13) {
+      conn = peer.connect(window.joinPeer.value.trim());
+      onConnection();
+      const call = peer.call(window.joinPeer.value.trim(), stream);
+      onCall(call);
+    }
+  });
+
+  window.muteButton.addEventListener('click', () => {
+    friend.muted = !friend.muted;
+    window.muteButton.setAttribute('muted', friend.muted);
+  });
+  window.muteButton.setAttribute('muted', friend.muted);
 }
 
 function createStone() {
@@ -329,6 +385,22 @@ function onClick(event) {
     nextTurn();
     takeScore();
   }
+}
+
+function onConnection() {
+  remoteGame = true;
+  resetGame();
+  conn.on('data', onRemoteData);
+}
+
+function onCall(call) {
+  call.on('stream', (stream) => {
+    window.friend.srcObject = stream;
+  });
+}
+
+function onRemoteData(data) {
+  console.log('REMOTE DATA', data);
 }
 
 document.addEventListener('DOMContentLoaded', init);

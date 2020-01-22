@@ -11,11 +11,21 @@
         <div id="score"></div>
         <div id="board"></div>
         <button id="resetButton">Reset Game</button>
+        <button id="remoteButton">P2P Multi-player</button>
       </div>
-      <div id="videoContainer">
-        <label for="inviteUrl">Invite URL:</label>
-        <input id="inviteUrl" type="text" readonly>
-        <video></video>
+
+      <div id="p2pContainer">
+        <div id="videoContainer">
+          <video autoplay id="friend"></video>
+          <video autoplay id="me"></video>
+          <button id="muteButton"></button>
+        </div>
+
+        <label for="myId">Your ID:</label>
+        <input id="myId" type="text" readonly>
+
+        <label for="joinPeer">Your friend's ID:</label>
+        <input id="joinPeer" type="text">
       </div>
     </div>
   </body>
