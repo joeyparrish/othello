@@ -6,10 +6,17 @@
     <link rel="stylesheet" href="othello.css">
   </head>
   <body>
-    <div id="container">
-      <div id="score"></div>
-      <div id="board"></div>
-      <button id="resetButton">Reset Game</button>
+    <div id="appContainer">
+      <div id="gameContainer">
+        <div id="score"></div>
+        <div id="board"></div>
+        <button id="resetButton">Reset Game</button>
+      </div>
+      <div id="videoContainer">
+        <label for="inviteUrl">Invite URL:</label>
+        <input id="inviteUrl" type="text" readonly>
+        <video></video>
+      </div>
     </div>
   </body>
 </html>

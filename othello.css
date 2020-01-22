@@ -1,9 +1,3 @@
-#container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
 #board {
   display: grid;
   grid-template: repeat(8, 1fr) / repeat(8, 1fr);
@@ -200,4 +194,42 @@ button {
 
   margin: 4vmin;
   padding: 0 4vmin;
+}
+
+#appContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+#gameContainer,
+#videoContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#inviteUrl {
+  width: 30vmin;
+  margin-bottom: 5vmin;
+}
+
+video {
+  width: 40vmin;
+  height: 40vmin;
+  background-color: black;
+}
+
+@media (orientation: portrait) {
+  #appContainer {
+    flex-direction: column;
+  }
+}
+
+@media (orientation: landscape) {
+  #videoContainer {
+    margin-left: 20vmin;
+  }
 }
