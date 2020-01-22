@@ -7,6 +7,7 @@ let peer;
 let conn;
 let remoteGame = false;
 let myColor;
+let stream;
 
 function init() {
   scoreElements.black = createScore('black');
@@ -50,7 +51,7 @@ function init() {
 }
 
 async function setupRtc() {
-  const stream = await navigator.mediaDevices.getUserMedia({
+  stream = await navigator.mediaDevices.getUserMedia({
     video: {
       width: 500,
       height: 500,
@@ -89,6 +90,7 @@ function closeRtc() {
   conn = null;
   remoteGame = false;
   myColor = null;
+  stream = null;
 
   window.myId.value = '';
 
