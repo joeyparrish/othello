@@ -16,6 +16,10 @@
   box-sizing: border-box;
 }
 
+#score {
+  margin-bottom: 1vmin;
+}
+
 .score-wrapper {
   display: inline-block;
   width: 40vmin;
