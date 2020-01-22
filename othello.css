@@ -170,12 +170,12 @@ svg {
   50% {
     transform: scaleX(0);
     fill: black;
-    stroke: white;
+    stroke: none;
   }
   50.001% {
     transform: scaleX(0);
     fill: white;
-    stroke: black;
+    stroke: none;
   }
   100% {
     transform: scaleX(1);
@@ -193,12 +193,12 @@ svg {
   50% {
     transform: scaleX(0);
     fill: white;
-    stroke: black;
+    stroke: none;
   }
   50.001% {
     transform: scaleX(0);
     fill: black;
-    stroke: white;
+    stroke: none;
   }
   100% {
     transform: scaleX(1);
