@@ -14,7 +14,13 @@ function init() {
   createBoard();
   resetGame();
 
-  window.resetButton.addEventListener('click', resetGame);
+  window.resetButton.addEventListener('click', () => {
+    if (remoteGame) {
+      conn.send({reset: true});
+    }
+
+    resetGame();
+  });
 
   if (navigator.mediaDevices) {
     window.remoteButton.classList.add('show');
@@ -35,6 +41,7 @@ async function setupRtc() {
   window.me.muted = true;
   window.me.srcObject = stream;
 
+  window.remoteButton.classList.remove('show');
   window.p2pContainer.classList.add('show');
 
   peer = new Peer();
@@ -414,6 +421,11 @@ function onCall(call) {
 
 function onRemoteData(data) {
   console.log('REMOTE DATA', data);
+  if (data.reset) {
+    resetGame();
+    return;
+  }
+
   const ok = playStone(data.x, data.y, data.color);
   if (ok) {
     nextTurn();
