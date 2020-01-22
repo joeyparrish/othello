@@ -2,7 +2,8 @@
 
 Multi-player, browser-based, server-less Othello.
 
-Just load index.html in your browser.
+Just load index.html in your browser,
+or visit https://cashpipeplusplus.github.io/othello/
 
 ## License
 
