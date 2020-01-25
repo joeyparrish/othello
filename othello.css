@@ -1,3 +1,7 @@
+:root {
+  --square-size: 10vmin;
+}
+
 body {
   /* So the user can't horizontally scroll to the corner of the ribbon on the
    * right side of the page. */
@@ -55,8 +59,8 @@ a {
 
 .square,
 .stone-container {
-  width: 10vmin;
-  height: 10vmin;
+  width: var(--square-size);
+  height: var(--square-size);
 }
 
 .square {
@@ -75,23 +79,23 @@ a {
 }
 
 .spot-0 {
-  left: 19vmin;
-  top: 19vmin;
+  left: calc(var(--square-size) * 2 - 1vmin);
+  top: calc(var(--square-size) * 2 - 1vmin);
 }
 
 .spot-1 {
-  left: 59vmin;
-  top: 19vmin;
+  left: calc(var(--square-size) * 6 - 1vmin);
+  top: calc(var(--square-size) * 2 - 1vmin);
 }
 
 .spot-2 {
-  left: 19vmin;
-  top: 59vmin;
+  left: calc(var(--square-size) * 2 - 1vmin);
+  top: calc(var(--square-size) * 6 - 1vmin);
 }
 
 .spot-3 {
-  left: 59vmin;
-  top: 59vmin;
+  left: calc(var(--square-size) * 6 - 1vmin);
+  top: calc(var(--square-size) * 6 - 1vmin);
 }
 
 #score {
@@ -100,7 +104,7 @@ a {
 
 .score-wrapper {
   display: inline-block;
-  width: 40vmin;
+  width: calc(4 * var(--square-size));
   text-align: center;
   line-height: 0;  /* Fixes some weirdness with sizing of text in edge cases */
 }
@@ -115,8 +119,8 @@ a {
 .score-text {
   display: inline-block;
   vertical-align: top;
-  font-size: 10vmin;
-  line-height: 10vmin;
+  font-size: var(--square-size);
+  line-height: var(--square-size);
 }
 
 .score-text:before {
@@ -130,7 +134,7 @@ a {
 .msg-container {
   position: absolute;
   display: inline-block;
-  font-size: 3vmin;
+  font-size: calc(0.3 * var(--square-size));
   font-weight: bold;
 }
 
@@ -392,30 +396,16 @@ video#me {
 }
 
 @media (orientation: landscape) {
-  /* In landscapre mode, move the p2p container down a bit out of the way of
-   * the version banner. */
+  /* In landscape mode, move the p2p container down a bit out of the way of the
+   * version banner. */
   #p2pContainer {
     margin-top: 20vmin;
   }
 
-  /* In landscapre mode, reduce the size of the squares slightly to make room
+  /* In landscape mode, reduce the size of the squares slightly to make room
    * for the reset button without scrolling. */
-  .square,
-  .stone-container {
-    width: 8vmin;
-    height: 8vmin;
-  }
-
-  /* Make sure the score matches size with the board. */
-  .score-text {
-    font-size: 8vmin;
-    line-height: 8vmin;
-  }
-  .score-wrapper {
-    width: 32vmin;
-  }
-  .msg-container {
-    font-size: 2.4vmin;
+  :root {
+    --square-size: 8vmin;
   }
 }
 
