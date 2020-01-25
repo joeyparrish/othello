@@ -18,5 +18,6 @@
 0.5 hour  - add service worker
 0.25 hour - fix glitchy pass indicator
 0.25 hour - fix rapid play bug and add danger zone indicators
+0.5 hour - fix spacing for various screen sizes, add version banner
 ===========
-12.0 hours
+12.5 hours = v1.0.0

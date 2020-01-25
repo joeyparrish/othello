@@ -1,3 +1,14 @@
+body {
+  /* So the user can't horizontally scroll to the corner of the ribbon on the
+   * right side of the page. */
+  overflow-x: hidden;
+}
+
+a {
+  color: unset;
+}
+
+#versionRibbon,
 #offlineRibbon {
   height: 4vmin;
   font-size: 4vmin;
@@ -17,6 +28,15 @@
   font-weight: bold;
   color: white;
   filter: drop-shadow(2px 4px 6px black);
+
+  z-index: 1;
+}
+
+#versionRibbon {
+  transform: rotate(45deg);
+  right: -6vmin;
+  left: unset;
+  background-color: green;
 }
 
 #offlineRibbon:not(.show) {
@@ -26,7 +46,6 @@
 #board {
   display: grid;
   grid-template: repeat(8, 1fr) / repeat(8, 1fr);
-  width: 80vmin;
 
   border: 0.15vmin solid black;
   box-sizing: border-box;
@@ -34,11 +53,14 @@
   position: relative;
 }
 
-.square {
-  background-color: green;
+.square,
+.stone-container {
   width: 10vmin;
   height: 10vmin;
+}
 
+.square {
+  background-color: green;
   border: 0.15vmin solid black;
   box-sizing: border-box;
   line-height: 0; /* Fixes minor positioning weirdness for svg at zoom */
@@ -80,12 +102,10 @@
   display: inline-block;
   width: 40vmin;
   text-align: center;
+  line-height: 0;  /* Fixes some weirdness with sizing of text in edge cases */
 }
 
-.score-wrapper .stone-container {
-  width: 10vmin;
-  height: 10vmin;
-
+.stone-container {
   position: relative;
   display: inline-flex;
   justify-content: center;
@@ -94,17 +114,13 @@
 
 .score-text {
   display: inline-block;
+  vertical-align: top;
+  font-size: 10vmin;
+  line-height: 10vmin;
 }
 
 .score-text:before {
   content: ":";
-}
-
-.score-text,
-.score-text:before {
-  font-size: 10vmin;
-  line-height: 10vmin;
-  vertical-align: top;
 }
 
 .turn {
@@ -328,19 +344,6 @@ video#me {
   right: 0;
 }
 
-@media (orientation: portrait) {
-  #appContainer {
-    flex-direction: column;
-    align-items: center;
-  }
-}
-
-@media (orientation: landscape) {
-  #p2pContainer {
-    margin-left: 20vmin;
-  }
-}
-
 #remoteButton:not(.show) {
   display: none;
 }
@@ -377,4 +380,63 @@ video#me {
   right: 0;
 
   background-image: url(close.svg);
+}
+
+/* If it's less than a 5/4 aspect ratio, the p2p container doesn't fit well on
+ * the right side, so treat it like it was portrait mode. */
+@media (orientation: portrait), (max-aspect-ratio: 5/4) {
+  #appContainer {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+@media (orientation: landscape) {
+  /* In landscapre mode, move the p2p container down a bit out of the way of
+   * the version banner. */
+  #p2pContainer {
+    margin-top: 20vmin;
+  }
+
+  /* In landscapre mode, reduce the size of the squares slightly to make room
+   * for the reset button without scrolling. */
+  .square,
+  .stone-container {
+    width: 8vmin;
+    height: 8vmin;
+  }
+
+  /* Make sure the score matches size with the board. */
+  .score-text {
+    font-size: 8vmin;
+    line-height: 8vmin;
+  }
+  .score-wrapper {
+    width: 32vmin;
+  }
+  .msg-container {
+    font-size: 2.4vmin;
+  }
+}
+
+/* At this minimum aspect ratio for landscape mode, put a very small gutter
+ * between the game container and the p2p container. */
+@media (orientation: landscape) and (min-aspect-ratio: 5/4) {
+  #p2pContainer {
+    margin-left: 3vmin;
+  }
+}
+
+/* At these slightly larger ratios, increase the spacing. */
+@media (orientation: landscape) and (min-aspect-ratio: 14/10) {
+  #p2pContainer {
+    margin-left: 10vmin;
+  }
+}
+
+/* At these slightly larger ratios, increase the spacing. */
+@media (orientation: landscape) and (min-aspect-ratio: 16/10) {
+  #p2pContainer {
+    margin-left: 20vmin;
+  }
 }
