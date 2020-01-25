@@ -17,5 +17,6 @@
 0.5 hour  - add web app manifest and improve lighthouse scores
 0.5 hour  - add service worker
 0.25 hour - fix glitchy pass indicator
+0.25 hour - fix rapid play bug and add danger zone indicators
 ===========
-11.75 hours
+12.0 hours

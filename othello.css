@@ -30,6 +30,8 @@
 
   border: 0.15vmin solid black;
   box-sizing: border-box;
+
+  position: relative;
 }
 
 .square {
@@ -40,6 +42,34 @@
   border: 0.15vmin solid black;
   box-sizing: border-box;
   line-height: 0; /* Fixes minor positioning weirdness for svg at zoom */
+}
+
+.spot {
+  position: absolute;
+  width: 2vmin;
+  height: 2vmin;
+  border-radius: 50%;
+  background-color: black;
+}
+
+.spot-0 {
+  left: 19vmin;
+  top: 19vmin;
+}
+
+.spot-1 {
+  left: 59vmin;
+  top: 19vmin;
+}
+
+.spot-2 {
+  left: 19vmin;
+  top: 59vmin;
+}
+
+.spot-3 {
+  left: 59vmin;
+  top: 59vmin;
 }
 
 #score {

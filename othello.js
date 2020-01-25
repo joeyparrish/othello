@@ -10,6 +10,7 @@ let remoteGame = false;
 let myColor;
 let stream;
 let passTimerId = null;
+let animatingFlip = false;
 
 function init() {
   scoreElements.black = createScore('black');
@@ -199,11 +200,21 @@ function createBoard() {
       div.dataset.x = x;
       div.dataset.y = y;
       div.addEventListener('click', onClick);
-      div.addEventListener('animationend', markValidMoves);
+      div.addEventListener('animationend', () => {
+        animatingFlip = false;
+        markValidMoves();
+      });
       div.appendChild(createStone());
       window.board.appendChild(div);
       row.push(div);
     }
+  }
+
+  for (let x = 0; x < 4; ++x) {
+    const spot = document.createElement('div');
+    spot.classList.add('spot');
+    spot.classList.add('spot-' + x);
+    window.board.appendChild(spot);
   }
 }
 
@@ -457,6 +468,7 @@ function playStone(x, y, color) {
     }
   }
 
+  animatingFlip = true;
   return true;
 }
 
@@ -465,6 +477,9 @@ function onClick(event) {
     return;
   }
   if (remoteGame && turn != myColor) {
+    return;
+  }
+  if (animatingFlip) {
     return;
   }
 
