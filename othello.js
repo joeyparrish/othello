@@ -161,7 +161,7 @@ function createStone() {
 function createScore(color) {
   const span = document.createElement('span');
   span.classList.add('score-wrapper');
-  window.score.appendChild(span);
+  window.scoreBoard.appendChild(span);
 
   const stoneContainer = document.createElement('span');
   stoneContainer.classList.add('stone-container');
@@ -197,6 +197,7 @@ function createBoard() {
     for (let x = 0; x < 8; ++x) {
       const div = document.createElement('div');
       div.classList.add('square');
+      div.classList.add('stone-container');
       div.dataset.x = x;
       div.dataset.y = y;
       div.addEventListener('click', onClick);
@@ -205,7 +206,7 @@ function createBoard() {
         markValidMoves();
       });
       div.appendChild(createStone());
-      window.board.appendChild(div);
+      window.gameBoard.appendChild(div);
       row.push(div);
     }
   }
@@ -213,8 +214,8 @@ function createBoard() {
   for (let x = 0; x < 4; ++x) {
     const spot = document.createElement('div');
     spot.classList.add('spot');
-    spot.classList.add('spot-' + x);
-    window.board.appendChild(spot);
+    spot.id = 'spot-' + x;
+    window.gameBoard.appendChild(spot);
   }
 }
 
@@ -250,8 +251,8 @@ function endGame() {
   scoreElements.white.container.classList.remove('turn');
   scoreElements.black.container.classList.remove('turn');
 
-  const black = window.board.querySelectorAll('.black').length;
-  const white = window.board.querySelectorAll('.white').length;
+  const black = window.gameBoard.querySelectorAll('.black').length;
+  const white = window.gameBoard.querySelectorAll('.white').length;
 
   if (black > white) {
     scoreElements.black.container.classList.add('win');
@@ -279,7 +280,7 @@ function resetGame() {
     scoreElements[color].container.classList.remove('bailed');
   }
 
-  for (const div of window.board.querySelectorAll('.square')) {
+  for (const div of window.gameBoard.querySelectorAll('.square')) {
     div.classList.remove('black');
     div.classList.remove('white');
     div.classList.remove('last');
@@ -307,8 +308,8 @@ function markValidMoves() {
     return;
   }
 
-  if (window.board.querySelector('.black') == null ||
-      window.board.querySelector('.white') == null) {
+  if (window.gameBoard.querySelector('.black') == null ||
+      window.gameBoard.querySelector('.white') == null) {
     // No pieces left!
     endGame();
     return;
@@ -326,7 +327,7 @@ function markValidMoves() {
     }
   }
 
-  if (window.board.querySelector('.valid') == null) {
+  if (window.gameBoard.querySelector('.valid') == null) {
     if (remoteGame) {
       conn.send({pass: true});
     }
@@ -351,7 +352,7 @@ function onPass() {
 }
 
 function unmarkValidMoves() {
-  for (const div of window.board.querySelectorAll('.valid')) {
+  for (const div of window.gameBoard.querySelectorAll('.valid')) {
     div.classList.remove('valid');
   }
 }
@@ -448,7 +449,7 @@ function playStone(x, y, color) {
   const playSquare = grid[y][x];
   playSquare.classList.add(color);
 
-  const last = window.board.querySelector('.last');
+  const last = window.gameBoard.querySelector('.last');
   if (last) {
     last.classList.remove('last');
   }

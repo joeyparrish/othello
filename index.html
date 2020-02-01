@@ -18,7 +18,7 @@
     <script src="othello.js"></script>
   </head>
   <body>
-    <div id="offlineRibbon">OFFLINE</div>
+    <div id="offlineRibbon" class="hide-by-default">OFFLINE</div>
 
     <div id="versionRibbon">
       <a href="https://github.com/cashpipeplusplus/othello"
@@ -27,13 +27,14 @@
 
     <div id="appContainer">
       <div id="gameContainer">
-        <div id="score"></div>
-        <div id="board"></div>
+        <div id="scoreBoard"></div>
+        <div id="gameBoard"></div>
         <button id="resetButton">Reset Game</button>
-        <button id="remoteButton">P2P Multi-player</button>
+        <button id="remoteButton"
+                class="hide-by-default">P2P Multi-player</button>
       </div>
 
-      <div id="p2pContainer">
+      <div id="p2pContainer" class="hide-by-default">
         <div id="videoContainer">
           <video autoplay id="friend"></video>
           <video autoplay id="me"></video>
@@ -41,7 +42,7 @@
           <button id="closeRtcButton"></button>
         </div>
 
-        <div id="idContainer">
+        <div id="idContainer" class="hide-by-default">
           <label for="myId">Your ID:</label>
           <input id="myId" type="text" readonly>
 

@@ -1,4 +1,11 @@
+/* ===========================
+ * General, high-level styles.
+ * =========================== */
+
 :root {
+  /* The size of the squares in the Othello board.  Many other things are
+   * computed relative to this size, which will change in certain screen
+   * layouts and sizes. */
   --square-size: 10vmin;
 }
 
@@ -9,9 +16,48 @@ body {
 }
 
 a {
+  /* No special color for links. */
   color: unset;
 }
 
+button {
+  /* Buttons are white and rounded. */
+  background-color: white;
+  border: black solid 0.15vmin;
+  border-radius: 3.5vmin;
+  height: 7vmin;
+  font-size: 4.5vmin;
+  padding: 0 3.5vmin;
+}
+
+label,
+input[type=text] {
+  /* Text inputs and their labels should have the same font size. */
+  font-size: 3vmin;
+}
+
+input[type=text] {
+  /* Text input sizing and spacing. */
+  width: 30vmin;
+  margin-bottom: 5vmin;
+}
+
+.hide-by-default:not(.show) {
+  /* Hidden by default.  The .show class will remove this attribute and revert
+   * to the original display value, whatever it was.  This is marked
+   * "important" to bypass the normal specificity rules that would make the
+   * ID-based selectors take priority over this class-based one. */
+  display: none !important;
+}
+
+
+/* =======================
+ * Ribbons in the corners.
+ * ======================= */
+
+/* The ribbons in the corners that show the "offline" status and the release
+ * version with a link to the project source.  These are the things they have
+ * in common. */
 #versionRibbon,
 #offlineRibbon {
   height: 4vmin;
@@ -23,12 +69,9 @@ a {
   position: absolute;
   width: 30vmin;
   top: 7vmin;
-  left: -6vmin;
 
-  transform: rotate(-45deg);
   transform-origin: center center;
 
-  background-color: red;
   font-weight: bold;
   color: white;
   filter: drop-shadow(2px 4px 6px black);
@@ -36,41 +79,106 @@ a {
   z-index: 1;
 }
 
+#offlineRibbon {
+  /* A red ribbon in the left corner. */
+  transform: rotate(-45deg);
+  left: -6vmin;
+  background-color: red;
+}
+
 #versionRibbon {
+  /* A green ribbon in the right corner. */
   transform: rotate(45deg);
   right: -6vmin;
-  left: unset;
   background-color: green;
 }
 
-#offlineRibbon:not(.show) {
-  display: none;
+
+/* ======================
+ * High-level containers.
+ * ====================== */
+
+#appContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
 }
 
-#board {
+#gameContainer,
+#p2pContainer,
+#idContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#p2pContainer {
+  margin-top: 4vmin;
+}
+
+#videoContainer {
+  /* The smaller video element will be absolutely positioned within this. */
+  position: relative;
+
+  /* Makes sure the container is exactly the right size, with no extra space
+   * for descending text.  Without this, the bottom-aligned video element would
+   * hang too low. */
+  line-height: 0;
+
+  margin-bottom: 2vmin;
+}
+
+
+/* ===============
+ * The game board.
+ * =============== */
+
+#gameBoard {
+  /* The game board is an 8x8 grid. */
   display: grid;
   grid-template: repeat(8, 1fr) / repeat(8, 1fr);
 
+  /* The border around the whole board. */
   border: 0.15vmin solid black;
-  box-sizing: border-box;
 
+  /* The .spot elements will be positioned absolutely within this board. */
   position: relative;
 }
 
-.square,
+/* Any container that holds a stone, including a square in the board. */
 .stone-container {
   width: var(--square-size);
   height: var(--square-size);
+
+  /* For the score board stones, we need to make sure the size of the container
+   * is properly constrained.  Otherwise, display: inline would make the SVG
+   * inside blow up and escape the width & height above. */
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+
+  /* The score board stones have text overlayed with absolute positioning. */
+  position: relative;
 }
 
 .square {
+  /* The squares are all green with a black border. */
   background-color: green;
   border: 0.15vmin solid black;
+
+  /* The size of the squares should include the border, or else the overall
+   * board might be too big. */
   box-sizing: border-box;
-  line-height: 0; /* Fixes minor positioning weirdness for svg at zoom */
+
+  /* Fixes minor positioning weirdness for svg at zoom */
+  line-height: 0;
 }
 
 .spot {
+  /* A "dot" at the corners of certain parts of the board.  This base class
+   * contains everything but the actual positions. */
   position: absolute;
   width: 2vmin;
   height: 2vmin;
@@ -78,59 +186,69 @@ a {
   background-color: black;
 }
 
-.spot-0 {
+/* The positions of specific spots. */
+#spot-0 {
   left: calc(var(--square-size) * 2 - 1vmin);
   top: calc(var(--square-size) * 2 - 1vmin);
 }
-
-.spot-1 {
+#spot-1 {
   left: calc(var(--square-size) * 6 - 1vmin);
   top: calc(var(--square-size) * 2 - 1vmin);
 }
-
-.spot-2 {
+#spot-2 {
   left: calc(var(--square-size) * 2 - 1vmin);
   top: calc(var(--square-size) * 6 - 1vmin);
 }
-
-.spot-3 {
+#spot-3 {
   left: calc(var(--square-size) * 6 - 1vmin);
   top: calc(var(--square-size) * 6 - 1vmin);
 }
 
-#score {
+/* The buttons below the game board should be spaced apart a little. */
+#resetButton,
+#remoteButton {
+  margin-top: 4vmin;
+}
+
+
+/* ====================================
+ * The score board and status displays.
+ * ==================================== */
+
+#scoreBoard {
   margin-bottom: 1vmin;
 }
 
 .score-wrapper {
+  /* A wrapper for the score of an individual player. */
   display: inline-block;
   width: calc(4 * var(--square-size));
   text-align: center;
-  line-height: 0;  /* Fixes some weirdness with sizing of text in edge cases */
-}
 
-.stone-container {
-  position: relative;
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
+  /* Fixes some weirdness with sizing of text in edge cases */
+  line-height: 0;
 }
 
 .score-text {
+  /* Make sure the score text aligns well with the stone. */
   display: inline-block;
   vertical-align: top;
   font-size: var(--square-size);
   line-height: var(--square-size);
 }
 
+/* Add a colon before the score. */
 .score-text:before {
   content: ":";
 }
 
+/* Class attached to the stone in the score panel of the player whose turn it
+ * is. */
 .turn {
   filter: drop-shadow(-1vmin 1vmin 1vmin blue);
 }
 
+/* The message container shows some status text on top of the stone. */
 .msg-container {
   position: absolute;
   display: inline-block;
@@ -138,26 +256,31 @@ a {
   font-weight: bold;
 }
 
+/* The white stone will have messages in black text, and vice-versa. */
+.white .msg-container {
+  color: black;
+}
 .black .msg-container {
   color: white;
 }
 
+/* Use classes on the score-board stone to show the various status messages in
+ * the message container. */
 .pass .msg-container:before {
   content: "PASS";
 }
-
 .win .msg-container:before {
   content: "WIN";
 }
-
 .tie .msg-container:before {
   content: "TIE";
 }
-
 .bailed .msg-container:before {
   content: "GONE";
 }
 
+/* These states will show change the color of the shadow behind the score board
+ * stone. */
 .tie,
 .win {
   filter: drop-shadow(-1vmin 1vmin 1vmin red);
@@ -167,14 +290,43 @@ a {
   filter: drop-shadow(-1vmin 1vmin 1vmin green);
 }
 
+/* A class applied temporarily to the score text to animate it when it changes.
+ * The class is removed again when the animation is complete. */
+.animated-text {
+  animation: animate-text 0.6s ease-in-out;
+}
+
+/* Pulse the text a little bigger to draw the eye. */
+@keyframes animate-text {
+  0% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(1.4, 1.4);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
+}
+
+
+/* ======================
+ * The stones themselves.
+ * ====================== */
+
 svg {
+  /* The SVG should scale according to its container. */
   width: 100%;
   height: 100%;
 }
 
+/* The circle within the SVG. */
 .stone {
+  /* When we use transform to animate it, do it relative to the center. */
   transform-origin: 50% 50%;
 
+  /* Empty by default.  Game board squares all contain an SVG for a stone, but
+   * you just won't see it until we give the container a color class. */
   fill: none;
   stroke: none;
   stroke-width: 1px;  /* In SVG coordinates, not page coordinates. */
@@ -190,27 +342,35 @@ svg {
   stroke: black;
 }
 
-.black.flip .stone {
-  animation: flip-black 1s ease-in-out;
-}
-
-.white.flip .stone {
-  animation: flip-white 1s ease-in-out;
-}
-
+/* The circle inside the stone circle, which is used to show various states. */
 .indicator {
   fill: none;
   stroke: none;
 }
 
+/* If this is the last piece played, make the indicator red. */
 .last .indicator {
   fill: red;
 }
 
+/* If this is a square for a valid play, make the indicator 50% transparent
+ * black. */
 .valid .indicator {
   fill: rgba(0, 0, 0, 0.5);
 }
 
+/* When we flip a stone, we use the .flip class temporarily to animate the
+ * change. There are separate animations for black & white because you can't
+ * use CSS filters to change the stroke and fill colors in an SVG. */
+.black.flip .stone {
+  animation: flip-black 1s ease-in-out;
+}
+.white.flip .stone {
+  animation: flip-white 1s ease-in-out;
+}
+
+/* Flip from black to white by shrinking horizontally, then expanding back out
+ * to full size.  Fade out the stroke along the way to reduce aliasing. */
 @keyframes flip-white {
   0% {
     transform: scaleX(1);
@@ -234,6 +394,7 @@ svg {
   }
 }
 
+/* The same animation as above, but from white to black. */
 @keyframes flip-black {
   0% {
     transform: scaleX(1);
@@ -257,87 +418,20 @@ svg {
   }
 }
 
-.animated-text {
-  animation: animate-text 0.6s ease-in-out;
-}
 
-@keyframes animate-text {
-  0% {
-    transform: scale(1, 1);
-  }
-  50% {
-    transform: scale(1.4, 1.4);
-  }
-  100% {
-    transform: scale(1, 1);
-  }
-}
+/* ===================
+ * The P2P components.
+ * =================== */
 
-button {
-  background-color: white;
-  border: black solid 0.15vmin;
-  border-radius: 4vmin;
-  height: 8vmin;
-  font-size: 5vmin;
-
-  padding: 0 4vmin;
-}
-
-#resetButton,
-#remoteButton {
-  margin-top: 4vmin;
-}
-
-#appContainer {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: center;
-}
-
-#gameContainer,
-#p2pContainer,
-#idContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-#p2pContainer {
-  margin-top: 4vmin;
-}
-
-#p2pContainer:not(.show) {
-  display: none;
-}
-
-#idContainer:not(.show) {
-  display: none;
-}
-
-label,
-input[type=text] {
-  font-size: 3vmin;
-}
-
-input[type=text] {
-  width: 30vmin;
-  margin-bottom: 5vmin;
-}
-
-#videoContainer {
-  position: relative;
-  line-height: 0;
-  margin-bottom: 2vmin;
-}
-
+/* The video of your friend. */
 video#friend {
   width: 40vmin;
   height: 40vmin;
   background-color: black;
 }
 
+/* The video of you, smaller and layered on top of the other one in the
+ * bottom-right corner. */
 video#me {
   width: 10vmin;
   height: 10vmin;
@@ -348,10 +442,7 @@ video#me {
   right: 0;
 }
 
-#remoteButton:not(.show) {
-  display: none;
-}
-
+/* The close and mute buttons are round and white. */
 #closeRtcButton,
 #muteButton {
   width: 5vmin;
@@ -366,25 +457,31 @@ video#me {
   background-size: 90%;
 }
 
+/* Mute in the bottom-left corner of the video. */
 #muteButton {
   bottom: 0;
   left: 0;
 }
 
+/* Set the mute button image according to the state. */
 #muteButton[muted=true] {
   background-image: url(volume_off.svg);
 }
-
 #muteButton[muted=false] {
   background-image: url(volume_up.svg);
 }
 
+/* Close in the top-right corner, with a fixed image. */
 #closeRtcButton {
   top: 0;
   right: 0;
-
   background-image: url(close.svg);
 }
+
+
+/* =====================================================
+ * Changes to the layout and sizing based on the screen.
+ * ===================================================== */
 
 /* If it's less than a 5/4 aspect ratio, the p2p container doesn't fit well on
  * the right side, so treat it like it was portrait mode. */
