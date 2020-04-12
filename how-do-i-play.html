@@ -24,10 +24,10 @@
 
     <style>
       #exampleBoard {
-        /* The example board is a 5x1 grid. */
+        /* The example board is a 8x1 grid. */
         display: grid;
-        grid-template: repeat(1, 1fr) / repeat(5, 1fr);
-        width: calc(var(--square-size) * 5);
+        grid-template: repeat(1, 1fr) / repeat(8, 1fr);
+        width: calc(var(--square-size) * 8);
 
         /* The border around the whole board. */
         border: 0.15vmin solid black;
@@ -40,13 +40,17 @@
     <h2>How do I play?</h2>
     <p>
       You take turns placing stones on the squares of the board.  You may only
-      play stones that capture some of the other player's stones.  Any stones
-      in between yours and the other player's are captured, and flip over to
-      show the opposite color.  For example:
+      play a stone that captures some of the other player's stones.  A stone is
+      captured if there is one or more opponent's stone between your new play
+      and another stone of yours.  The captured stones flip over to show the
+      opposite color.  For example:
     </p>
     <div id="exampleBoard">
       <div class="square stone-container valid"></div>
       <div class="square stone-container white"></div>
+      <div class="square stone-container white"></div>
+      <div class="square stone-container white"></div>
+      <div class="square stone-container black"></div>
       <div class="square stone-container white"></div>
       <div class="square stone-container black"></div>
       <div class="square stone-container"></div>
@@ -55,28 +59,28 @@
       In this example, is it black's turn.  The square on the left is a valid
       move, and is marked with a small gray dot.  The square on the right is
       not a valid move, because it doesn't border any white stones and would
-      not capture anything.  If black plays on the left, both white stones
-      would be captured and become black.
+      not capture anything.  If black plays on the left, the three white stones
+      on the left would be captured and become black.  The white stone in the
+      middle would not be captured, because the capture stops at the first
+      black stone.
     </p>
 
     <p>
       If you cannot capture any of the other player's stones, you must pass.
       The app will determine this for you and give control back to the other
-      player after showing "PASS" on your part of the score board at the top.
-      For example:
+      player after showing this on your part of the score board:
+      <span class="stone-container white turn pass">
+        <span class="msg-container"></span>
+      </span>
     </p>
-    <div class="stone-container white turn pass">
-      <div class="msg-container"></div>
-    </div>
 
     <p>
-      When the board is full, the game is over.  Whichever player has the most
-      stones wins.  The app will show "WIN" on the score board at the top.  For
-      example:
+      When the board is full, the game is over.  The player with the most
+      stones wins.  The app will show this on the score board for the winner:
+      <span class="stone-container black win">
+        <span class="msg-container"></span>
+      </span>
     </p>
-    <div class="stone-container black win">
-      <div class="msg-container"></div>
-    </div>
 
     <p>
       You can start the game over at any time using the "Reset Game" button at
@@ -85,10 +89,10 @@
 
     <h3>Playing locally</h3>
     <p>
-      To play locally, you can use a touch screen, track pad, mouse or any
-      other pointing device.  Players take turns clicking or tapping on the
-      same device to make their moves.  This works really well with a tablet
-      laying on the table between two players.
+      To play locally, two players take turns clicking or tapping on the same
+      device to make their moves.  This works really well with a tablet or
+      phone laying on the table between two players, but can also be done on a
+      laptop or desktop with a mouse.
     </p>
 
     <h3>Playing offline</h3>
@@ -101,9 +105,9 @@
     <h3>Playing with a friend over the internet</h3>
     <p>
       To play over the internet, click or tap on the "P2P Multi-player" button
-      at the bottom of the screen.  A video chat will appear to the right of or
-      beneath the game board.  Click or tap on the text under "Your ID" to copy
-      it to the clipboard.  Send this text to a friend.  Your friend then
+      at the bottom of the screen.  A video chat will appear under or to the
+      right of the game board.  Click or tap on the text under "Your ID" to
+      copy it to the clipboard.  Send this text to a friend.  Your friend then
       pastes your ID into the field labelled "Your friend's ID" and hits enter
       on the keyboard or tablet/phone's on-screen keyboard.  This will start
       the connection between you and your friend.
@@ -111,9 +115,7 @@
     <p>
       During the game, you can see and talk to your friend while you play.
       There is a mute button which can be used to mute or unmute the connection.
-      When either end is muted, neither of you can hear each other.  You can
-      use the "X" button on the video to terminate the connection and go back
-      to local play.
+      You can use the "X" button on the video chat to end the connection.
     </p>
     <p>
       When it's your turn, your color will have a halo behind it at the top of
@@ -121,6 +123,8 @@
       dot.  Either player can use the "Reset Game" button at the bottom of the
       board at any time to start a new game.
     </p>
+
+    <h3>Match-making</h3>
     <p>
       This game is meant to be social and played with friends and family.  It
       is not meant as a way to meet internet trolls, so there is no
@@ -130,8 +134,8 @@
 
     <h2>Browser support</h2>
     <p>
-      This probably won't work on IE.  It should work on any current browser.
-      If it doesn't work for you, please file a new issue here:
+      This probably won't work on IE.  It should work on any <i>current</i>
+      browser.  If it doesn't work for you, please file a new issue here:
       <a href="https://github.com/cashpipeplusplus/othello/issues">https://github.com/cashpipeplusplus/othello/issues</a>
     </p>
   </body>

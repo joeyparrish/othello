@@ -25,6 +25,10 @@ body.docs {
   padding: 0 2em;
 }
 
+body.docs p span {
+  vertical-align: top;
+}
+
 a {
   /* No special color for links. */
   color: unset;
