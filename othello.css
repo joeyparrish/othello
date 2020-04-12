@@ -15,9 +15,35 @@ body {
   overflow-x: hidden;
 }
 
+body.docs {
+  /* The documentation pages look terrible without some limits on their size.
+   * The max width is set in em units so that it is limited to a certain number
+   * of characters rather than pixels. */
+  max-width: 42em;
+  margin: 0 auto;
+  border: 1px solid black;
+  padding: 0 2em;
+}
+
 a {
   /* No special color for links. */
   color: unset;
+}
+
+a.docs {
+  /* The documentation links at the bottom of the page should not take up space
+   * in the layout.  They should always be at the bottom. */
+  position: absolute;
+  bottom: 1em;
+  font-size: 3vmin;
+}
+
+/* Normally, these would be stacked */
+a.docs.left {
+  left: 1em;
+}
+a.docs.right {
+  right: 1em;
 }
 
 button {
@@ -503,6 +529,13 @@ video#me {
    * for the reset button without scrolling. */
   :root {
     --square-size: 8vmin;
+  }
+
+  /* In landscape mode, move the docs links both to the right hand side. */
+  a.docs.left {
+    bottom: 2.5em;
+    right: 1em;
+    left: auto;
   }
 }
 

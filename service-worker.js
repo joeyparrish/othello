@@ -8,6 +8,8 @@ const cachedFiles = [
 
   // The rest are relative URLs.
   'index.html',
+  'how-do-i-play.html',
+  'privacy-policy.html',
   'othello.css',
   'othello.js',
   'close.svg',

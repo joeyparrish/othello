@@ -27,10 +27,6 @@ let myColor = null;
 // A MediaStream object for the local WebRTC feed.
 let localStream = null;
 
-
-// Initialize the app when the DOM is fully loaded.
-document.addEventListener('DOMContentLoaded', init);
-
 function init() {
   // Create the score board.
   scoreElements.black = createScore('black');
@@ -81,9 +77,11 @@ function init() {
     }
   });
 
-  // When the mute button is clicked, toggle the mute status of the remote
-  // video feed.  There must be a mute button, because the remote feed cannot
-  // be muted on Android using the volume rocker only.
+  // When the mute button is clicked, toggle the mute status of both video
+  // feeds.  The mute button is necessary for the remote feed because it cannot
+  // be muted on Android using the volume rocker only.  The mute button is
+  // necessary for the local feed because it is the only way for the user to
+  // control their own privacy if they need to.
   window.muteButton.addEventListener('click', () => {
     const newState = !window.friend.muted;
 

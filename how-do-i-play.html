@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Othello - How do I play?</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Othello instructions.  Multi-player, browser-based, server-less Othello.  Can be played locally or P2P with video chat.">
+    <meta name="theme-color" content="#ffffff">
+
+    <link rel="stylesheet" href="othello.css">
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
+    <!-- Don't defer this, or we get a flash of an incomplete page. -->
+    <script src="othello.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        for (const container of document.querySelectorAll('.stone-container')) {
+          container.appendChild(createStone());
+        }
+      });
+    </script>
+
+    <style>
+      #exampleBoard {
+        /* The example board is a 5x1 grid. */
+        display: grid;
+        grid-template: repeat(1, 1fr) / repeat(5, 1fr);
+        width: calc(var(--square-size) * 5);
+
+        /* The border around the whole board. */
+        border: 0.15vmin solid black;
+      }
+    </style>
+  </head>
+  <body class="docs">
+    <h1>Othello</h1>
+
+    <h2>How do I play?</h2>
+    <p>
+      You take turns placing stones on the squares of the board.  You may only
+      play stones that capture some of the other player's stones.  Any stones
+      in between yours and the other player's are captured, and flip over to
+      show the opposite color.  For example:
+    </p>
+    <div id="exampleBoard">
+      <div class="square stone-container valid"></div>
+      <div class="square stone-container white"></div>
+      <div class="square stone-container white"></div>
+      <div class="square stone-container black"></div>
+      <div class="square stone-container"></div>
+    </div>
+    <p>
+      In this example, is it black's turn.  The square on the left is a valid
+      move, and is marked with a small gray dot.  The square on the right is
+      not a valid move, because it doesn't border any white stones and would
+      not capture anything.  If black plays on the left, both white stones
+      would be captured and become black.
+    </p>
+
+    <p>
+      If you cannot capture any of the other player's stones, you must pass.
+      The app will determine this for you and give control back to the other
+      player after showing "PASS" on your part of the score board at the top.
+      For example:
+    </p>
+    <div class="stone-container white turn pass">
+      <div class="msg-container"></div>
+    </div>
+
+    <p>
+      When the board is full, the game is over.  Whichever player has the most
+      stones wins.  The app will show "WIN" on the score board at the top.  For
+      example:
+    </p>
+    <div class="stone-container black win">
+      <div class="msg-container"></div>
+    </div>
+
+    <p>
+      You can start the game over at any time using the "Reset Game" button at
+      the bottom.
+    </p>
+
+    <h3>Playing locally</h3>
+    <p>
+      To play locally, you can use a touch screen, track pad, mouse or any
+      other pointing device.  Players take turns clicking or tapping on the
+      same device to make their moves.  This works really well with a tablet
+      laying on the table between two players.
+    </p>
+
+    <h3>Playing offline</h3>
+    <p>
+      To play offline, just load the URL.  If you've loaded it before, it
+      should be cached and available offline.  On some platforms, such as
+      Android, you may also be prompted to install the app to your home screen.
+    </p>
+
+    <h3>Playing with a friend over the internet</h3>
+    <p>
+      To play over the internet, click or tap on the "P2P Multi-player" button
+      at the bottom of the screen.  A video chat will appear to the right of or
+      beneath the game board.  Click or tap on the text under "Your ID" to copy
+      it to the clipboard.  Send this text to a friend.  Your friend then
+      pastes your ID into the field labelled "Your friend's ID" and hits enter
+      on the keyboard or tablet/phone's on-screen keyboard.  This will start
+      the connection between you and your friend.
+    </p>
+    <p>
+      During the game, you can see and talk to your friend while you play.
+      There is a mute button which can be used to mute or unmute the connection.
+      When either end is muted, neither of you can hear each other.  You can
+      use the "X" button on the video to terminate the connection and go back
+      to local play.
+    </p>
+    <p>
+      When it's your turn, your color will have a halo behind it at the top of
+      the scoreboard, and all valid moves will be marked for you with a gray
+      dot.  Either player can use the "Reset Game" button at the bottom of the
+      board at any time to start a new game.
+    </p>
+    <p>
+      This game is meant to be social and played with friends and family.  It
+      is not meant as a way to meet internet trolls, so there is no
+      match-making service.  You'll have to send your randomly-generated ID to
+      others using some other system, like a text message, chat, or email.
+    </p>
+
+    <h2>Browser support</h2>
+    <p>
+      This probably won't work on IE.  It should work on any current browser.
+      If it doesn't work for you, please file a new issue here:
+      <a href="https://github.com/cashpipeplusplus/othello/issues">https://github.com/cashpipeplusplus/othello/issues</a>
+    </p>
+  </body>
+</html>

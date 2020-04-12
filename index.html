@@ -16,13 +16,17 @@
     <script defer src="https://unpkg.com/peerjs@1.0.4/dist/peerjs.min.js"></script>
     <!-- Don't defer this, or we get a flash of an incomplete page. -->
     <script src="othello.js"></script>
+    <script>
+      // Initialize the app when the DOM is fully loaded.
+      document.addEventListener('DOMContentLoaded', init);
+    </script>
   </head>
   <body>
     <div id="offlineRibbon" class="hide-by-default">OFFLINE</div>
 
     <div id="versionRibbon">
       <a href="https://github.com/cashpipeplusplus/othello"
-         target="_blank">v1.0.2</a>
+         target="_blank">v1.0.3</a>
     </div>
 
     <div id="appContainer">
@@ -50,6 +54,11 @@
           <input id="joinPeer" type="text">
         </div>
       </div>
+    </div>
+
+    <div>
+      <a target="_blank" class="docs left" href="how-do-i-play.html">How do I play?</a>
+      <a target="_blank" class="docs right" href="privacy-policy.html">Privacy Policy</a>
     </div>
   </body>
 </html>
