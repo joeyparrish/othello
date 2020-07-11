@@ -6,13 +6,15 @@ const grid = [];
 const scoreElements = {};
 
 // Whose turn it is, either 'white' or 'black'.
-let turn = 'white';
+let turn;
 // A timer used when someone has to pass.
 let passTimerId = null;
 // True while the flip animation is in-progress.
 let animatingFlip = false;
 // True if the game is over.
 let gameOver = false;
+// The number of consecutive passes.  Game over at 2.
+let passCount = 0;
 
 // True if we're playing a P2P game.
 let remoteGame = false;
@@ -389,8 +391,10 @@ function resetGame() {
   grid[4][3].classList.add('black');
   grid[4][4].classList.add('white');
 
-  // White goes first.
-  turn = 'white';
+  // Black always goes first.
+  // https://www.worldothello.org/about/about-othello/othello-rules
+  turn = 'black';
+  passCount = 0;
   // Update the score.
   takeScore();
   // Indicate that it's the first player's turn.
@@ -413,6 +417,12 @@ function markValidMoves() {
   // If someone is out of pieces, the game is over.
   if (window.gameBoard.querySelector('.black') == null ||
       window.gameBoard.querySelector('.white') == null) {
+    endGame();
+    return;
+  }
+
+  // If both players had to pass, nobody can move and the game is over.
+  if (passCount >= 2) {
     endGame();
     return;
   }
@@ -440,7 +450,10 @@ function markValidMoves() {
       conn.send({pass: true});
     }
 
+    passCount++;
     onPass();
+  } else {
+    passCount = 0;
   }
 }
 
