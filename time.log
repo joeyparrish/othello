@@ -27,4 +27,5 @@
 1.5 hour  - massive JS cleanup and lots of comments
 1.5 hour  - writing and formatting docs
 0.5 hour  - proof-read and fix the docs
-0.5 hour  - fix infinite loop when nobody can play
+0.5 hour  - fix infinite loop when nobody can play, fix who goes first
+0.25 hour - fix icon to match correct starting game state (black goes first)
