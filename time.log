@@ -29,3 +29,6 @@
 0.5 hour  - proof-read and fix the docs
 0.5 hour  - fix infinite loop when nobody can play, fix who goes first
 0.25 hour - fix icon to match correct starting game state (black goes first)
+0.25 hour - add "(connecting...)" while waiting for PeerJS to generate an ID
+===========
+5.75 hours = v1.0.7

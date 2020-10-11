@@ -135,10 +135,14 @@ async function setupRtc() {
   window.idContainer.classList.add('show');
 
   // Connect to PeerJS.
+  window.myId.value = '(connecting...)';
+  window.myId.disabled = true;
+
   peer = new Peer();
   peer.on('open', () => {
     // When we know our own ID, fill in that part of the UI.
     window.myId.value = peer.id;
+    window.myId.disabled = false;
   });
 
   peer.on('call', (callArg) => {
