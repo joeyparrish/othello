@@ -13,6 +13,9 @@ body {
   /* So the user can't horizontally scroll to the corner of the ribbon on the
    * right side of the page. */
   overflow-x: hidden;
+  /* Disable pull-to-refresh on mobile.  It is too easy to accidentally lose
+   * your connection during P2P play if you can pull to refresh. */
+  overscroll-behavior-y: contain;
 }
 
 body.docs {
