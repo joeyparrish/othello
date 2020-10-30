@@ -153,7 +153,7 @@ async function setupRtc() {
   window.myId.value = '(connecting...)';
   window.myId.disabled = true;
 
-  peer = new Peer();
+  peer = new Peer(generateRandomId());
   peer.on('open', () => {
     // When we know our own ID, fill in that part of the UI.
     window.myId.value = peer.id;
@@ -774,4 +774,29 @@ function onOnlineStatusChanged() {
   } else {
     window.remoteButton.classList.remove('show');
   }
+}
+
+// PeerJS IDs are too long to tell someone without copy/paste.  The ID should
+// be short and easy to get right.  No confusing characters like l/1/I, 0/O/o.
+// How about all numbers?  With dashes in it?  It's similar to a phone number,
+// and the lack of letters will make it clear that 0 is 0 and not o/O.
+// It's gross how much effort this is in JavaScript.  Did I do this wrong?
+function generateRandomId() {
+  const randomBuffer = crypto.getRandomValues(new Uint8Array(4)).buffer;
+  const rand32 = (new DataView(randomBuffer)).getUint32();
+  // scale 2^32 down to 10^10 (9-digit number)
+  let idNumber = Math.floor((rand32 / 0x100000000) * 1e10);
+  // break it up into 3 groups of 3 digits
+  const idParts = []
+  for (let i = 0; i < 3; ++i) {
+    const part = idNumber % 1000;
+    idNumber = (idNumber - part) / 1000;
+
+    let partString = part.toString();
+    while (partString.length < 3) {
+      partString = '0' + partString;
+    }
+    idParts.push(partString);
+  }
+  return idParts.join('-');
 }

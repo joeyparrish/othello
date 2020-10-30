@@ -33,3 +33,7 @@
 0.5 hour  - add novideo mode and connection error handling
 ===========
 6.25 hours = v1.1.0
+
+0.5 hour  - add own ID generator instead of relying on PeerJS
+===========
+0.5 hours = v1.1.1
