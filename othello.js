@@ -202,7 +202,12 @@ async function setupRtc() {
 }
 
 function registerWithPeerJs(id, counter) {
-  peer = new Peer(counter ? id + '-' + counter : id);
+  const options = {};
+  if (urlParameters.has('peerserver')) {
+    options.host = urlParameters.get('peerserver');
+  }
+
+  peer = new Peer(counter ? id + '-' + counter : id, options);
   peer.on('open', () => {
     // When we know our own ID, fill in that part of the UI.
     window.myId.value = peer.id;
