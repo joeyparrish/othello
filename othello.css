@@ -148,6 +148,9 @@ input[type=text] {
 }
 
 #p2pContainer {
+  /* The close button will be absolutely positioned within this. */
+  position: relative;
+
   margin-top: 4vmin;
 }
 
