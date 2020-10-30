@@ -228,16 +228,20 @@ function registerWithPeerJs(id, counter) {
   });
 
   peer.on('connection', (connArg) => {
-    // When a data connection comes in, answer it and assign the first player
-    // to 'black'.
+    // When a data connection comes in, answer it.
     if (!conn || !conn.open) {
+      // If it's the first connection, assign the first player to 'black'.
       conn = connArg;
       onConnection('black');
-      // FIXME: Send current game state to opponent
     } else {
+      // Otherwise, add it to the observer list.
       observers.push(connArg);
-      // FIXME: Send current game state to observers
     }
+
+    // Wait for the data channel to be open, then send the full game state.
+    connArg.on('open', () => {
+      sendFullGameState(connArg);
+    });
   });
 
   peer.on('error', (error) => {
@@ -527,6 +531,7 @@ function markValidMoves() {
   // In a P2P game, don't show the valid move indicators when it's the other
   // player's turn.
   if (remoteGame && turn != myColor) {
+    unmarkValidMoves();
     return;
   }
 
@@ -694,7 +699,7 @@ function playStone(x, y, color) {
   }
 
   // In a P2P game, for your own plays, send info about this play over the data
-  // connection to your peer.
+  // connection to your peers.
   if (remoteGame && color == myColor) {
     broadcast({x, y, color});
   }
@@ -835,6 +840,12 @@ function onRemoteData(data) {
     return;
   }
 
+  // The full game state when we initially join the game.
+  if (data.state) {
+    ingestFullGameState(data.state);
+    return;
+  }
+
   // Otherwise, it's a play.
   const ok = playStone(data.x, data.y, data.color);
   // If the play was valid, update the score and switch turns.
@@ -842,6 +853,66 @@ function onRemoteData(data) {
     nextTurn();
     takeScore();
   }
+}
+
+// Called when someone connects to the first player (second player or observer)
+function sendFullGameState(someConnection) {
+  const state = {
+    grid: [],
+    scores: {},
+    turn,
+    gameOver,
+    passCount,
+  };
+
+  for (const row of grid) {
+    const rowState = [];
+    for (const square of row) {
+      rowState.push(square.className);
+    }
+    state.grid.push(rowState);
+  }
+
+  for (const color in scoreElements) {
+    const elements = scoreElements[color];
+    const scoreState = {
+      classes: elements.container.className,
+      points: elements.scoreSpan.textContent,
+    };
+    state.scores[color] = scoreState;
+  }
+
+  console.log('SENDING FULL STATE', state);
+  someConnection.send({state});
+}
+
+// Called when someone connects to the first player (second player or observer)
+// VERY TRUSTING
+// The other player should be a friend, who you are looking at on video chat.
+// And you also have access to the "reset" button, so if they cheat you, reset.
+function ingestFullGameState(state) {
+  console.log('RECEIVING FULL STATE', state);
+
+  for (let y = 0; y < 8; ++y) {
+    for (let x = 0; x < 8; ++x) {
+      grid[y][x].className = state.grid[y][x];
+    }
+  }
+
+  for (const color in scoreElements) {
+    const elements = scoreElements[color];
+    elements.container.className = state.scores[color].classes;
+    elements.scoreSpan.textContent = state.scores[color].points;
+  }
+
+  turn = state.turn;
+  gameOver = state.gameOver;
+  passCount = state.passCount;
+
+  // The "valid" moves for the other person don't show for me, and vice-versa.
+  // So after ingesting the game state, including the "valid" markers for the
+  // other person, compute the valid moves for ourselves.
+  markValidMoves();
 }
 
 // Called when the online/offline status changes.

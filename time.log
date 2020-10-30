@@ -40,3 +40,6 @@
 1.5 hours = v1.2.0
 
 0.5 hour  - partial observer support (no sharing of game state on join)
+0.5 hour  - full observer support (sending full game state on join)
+===========
+1.0 hours = v1.3.0
