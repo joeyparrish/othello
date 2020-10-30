@@ -29,6 +29,8 @@ let myColor = null;
 // A MediaStream object for the local WebRTC feed.
 let localStream = null;
 
+const withVideo = location.search != '?novideo';
+
 function init() {
   // Create the score board.
   scoreElements.black = createScore('black');
@@ -69,13 +71,22 @@ function init() {
   window.joinPeer.addEventListener('keypress', (event) => {
     if (event.keyCode == 13) {
       // Initiate a data connection first.
-      conn = peer.connect(window.joinPeer.value.trim());
-      // The local player will be 'white'.
-      onConnection('white');
+      const peerId = window.joinPeer.value.trim();
+      conn = peer.connect(peerId);
 
-      // Then try to establish a video call.
-      call = peer.call(window.joinPeer.value.trim(), localStream);
-      onCall();
+      window.joinPeer.value = '(connecting...)';
+      window.joinPeer.disabled = true;
+
+      conn.on('open', () => {
+        // The local player will be 'white'.
+        onConnection('white');
+
+        if (withVideo) {
+          // Then try to establish a video call.
+          call = peer.call(window.joinPeer.value.trim(), localStream);
+          onCall();
+        }
+      });
     }
   });
 
@@ -112,22 +123,26 @@ function init() {
 
 // Set up WebRTC-based P2P game.
 async function setupRtc() {
-  // Initialize the video to be unmuted.
-  window.friend.muted = false;
-  window.muteButton.setAttribute('muted', window.friend.muted);
+  if (withVideo) {
+    // Initialize the video to be unmuted.
+    window.friend.muted = false;
+    window.muteButton.setAttribute('muted', window.friend.muted);
 
-  // Get a local media stream from the user's camera & mic.
-  localStream = await navigator.mediaDevices.getUserMedia({
-    video: {
-      width: 500,
-      height: 500,
-      facingMode: 'user',
-    },
-    audio: true,
-  });
+    // Get a local media stream from the user's camera & mic.
+    localStream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        width: 500,
+        height: 500,
+        facingMode: 'user',
+      },
+      audio: true,
+    });
 
-  // Attach the local stream to the "me" video.
-  window.me.srcObject = localStream;
+    // Attach the local stream to the "me" video.
+    window.me.srcObject = localStream;
+
+    window.videoContainer.classList.add('show');
+  }
 
   // Hide the P2P button and show the P2P components.
   window.remoteButton.classList.remove('show');
@@ -160,9 +175,14 @@ async function setupRtc() {
   });
 
   peer.on('error', (error) => {
-    // If an error occurs, log it and close the P2P game.
+    // If an error occurs, log it and show an error message.
     console.log('PEER ERROR', error);
-    closeRtc();
+
+    window.joinPeer.value = '(ERROR!)';
+    setTimeout(() => {
+      window.joinPeer.value = '';
+      window.joinPeer.disabled = false;
+    }, 5000);
   });
 }
 
@@ -680,6 +700,9 @@ function onConnection(color) {
   // Start a new game, erasing whatever local play happened before this.
   resetGame();
 
+  window.joinPeer.value = conn.peer;
+  window.joinPeer.disabled = true;
+
   conn.on('data', onRemoteData);
   conn.on('close', () => {
     // When the connection is closed, remove turn indicator, win state, and tie
@@ -694,6 +717,8 @@ function onConnection(color) {
     // Mark the game as over, and remove all "valid move" indicators.
     gameOver = true;
     unmarkValidMoves();
+
+    window.joinPeer.disabled = false;
   });
 
   // When connected, hide the P2P IDs, which we don't need any more.

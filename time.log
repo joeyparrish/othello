@@ -30,5 +30,6 @@
 0.5 hour  - fix infinite loop when nobody can play, fix who goes first
 0.25 hour - fix icon to match correct starting game state (black goes first)
 0.25 hour - add waiting indicator for PeerJS, disable pull-to-refresh
+0.5 hour  - add novideo mode and connection error handling
 ===========
-5.75 hours = v1.0.8
+6.25 hours = v1.1.0
