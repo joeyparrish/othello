@@ -29,7 +29,15 @@ let myColor = null;
 // A MediaStream object for the local WebRTC feed.
 let localStream = null;
 
-const withVideo = location.search != '?novideo';
+const urlParameters = new Map();
+if (location.search) {
+  const pairs = location.search.substr(1).split('&');
+  for (const pair of pairs) {
+    const [key, value] = pair.split('=');
+    urlParameters.set(key, value);
+  }
+}
+const withVideo = !urlParameters.has('novideo');
 
 function init() {
   // Create the score board.
