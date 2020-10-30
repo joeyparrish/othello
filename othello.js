@@ -50,9 +50,8 @@ function init() {
   scoreElements.black = createScore('black');
   scoreElements.white = createScore('white');
 
-  // Create the game board and reset its state.
+  // Create the game board.
   createBoard();
-  resetGame();
 
   // When the reset button is clicked, reset the game.
   window.resetButton.addEventListener('click', () => {
@@ -68,7 +67,12 @@ function init() {
   if (tableId) {
     // Setup RTC right away.
     setupRtc();
+    // Hide the reset button until we're connected.
+    window.resetButton.classList.add('hide');
   } else {
+    // Set the initial board state.
+    resetGame();
+
     // When the P2P button is clicked, set up the WebRTC components.
     window.remoteButton.addEventListener('click', () => {
       // Hide the P2P button and show the P2P components.
@@ -167,6 +171,7 @@ function connectToPeer(peerId, color) {
     }
   });
 }
+
 // Set up WebRTC-based P2P game.
 async function setupRtc() {
   if (withVideo) {
@@ -216,7 +221,6 @@ function registerWithPeerJs(id, counter) {
     if (tableId && counter) {
       if (counter > 1) {
         connectToPeer(id, OBSERVER_COLOR);  // So it's never your turn
-        window.resetButton.classList.add('hide');
       } else {
         connectToPeer(id);
       }
@@ -238,6 +242,10 @@ function registerWithPeerJs(id, counter) {
       // If it's the first connection, assign the first player to 'black'.
       conn = connArg;
       onConnection('black');
+      if (tableId) {
+        // Finally set up the initial game.
+        resetGame();
+      }
     } else {
       // Otherwise, add it to the observer list.
       observers.push(connArg);
@@ -784,6 +792,9 @@ function onConnection(color) {
     window.tableStatus.textContent = 'Connected (observer)';
   } else {
     window.tableStatus.textContent = 'Connected';
+
+    // Finally show the reset button.
+    window.resetButton.classList.remove('hide');
   }
 
   window.joinPeer.value = conn.peer;

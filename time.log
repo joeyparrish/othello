@@ -43,3 +43,8 @@
 0.5 hour  - full observer support (sending full game state on join)
 ===========
 1.0 hours = v1.3.0
+
+0.25 hour - alternate peer server support
+0.5 hour  - do not set up game in table mode until connected
+===========
+0.75 hours = v1.3.2
