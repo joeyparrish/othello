@@ -38,6 +38,7 @@ if (location.search) {
   }
 }
 const withVideo = !urlParameters.has('novideo');
+const tableId = urlParameters.get('tableid');
 
 function init() {
   // Create the score board.
@@ -59,8 +60,24 @@ function init() {
     resetGame();
   });
 
-  // When the P2P button is clicked, set up the WebRTC components.
-  window.remoteButton.addEventListener('click', setupRtc);
+  if (tableId) {
+    // Setup RTC right away.
+    setupRtc();
+  } else {
+    // When the P2P button is clicked, set up the WebRTC components.
+    window.remoteButton.addEventListener('click', () => {
+      // Hide the P2P button and show the P2P components.
+      window.remoteButton.classList.remove('show');
+      window.p2pContainer.classList.add('show');
+      window.idContainer.classList.add('show');
+      if (withVideo) {
+        window.videoContainer.classList.add('show');
+      }
+
+      // Setup RTC.
+      setupRtc();
+    });
+  }
 
   // When the online/offline state changes, update the UI.  Then set the
   // initial state.
@@ -80,21 +97,7 @@ function init() {
     if (event.keyCode == 13) {
       // Initiate a data connection first.
       const peerId = window.joinPeer.value.trim();
-      conn = peer.connect(peerId);
-
-      window.joinPeer.value = '(connecting...)';
-      window.joinPeer.disabled = true;
-
-      conn.on('open', () => {
-        // The local player will be 'white'.
-        onConnection('white');
-
-        if (withVideo) {
-          // Then try to establish a video call.
-          call = peer.call(window.joinPeer.value.trim(), localStream);
-          onCall();
-        }
-      });
+      connectToPeer(peerId);
     }
   });
 
@@ -129,6 +132,25 @@ function init() {
   }
 }
 
+// Initiate a connection to a peer.  This is done you enter a friend's ID or
+// when using a table ID from the URL.
+function connectToPeer(peerId) {
+  conn = peer.connect(peerId);
+
+  window.joinPeer.value = '(connecting...)';
+  window.joinPeer.disabled = true;
+
+  conn.on('open', () => {
+    // The local player will be 'white'.
+    onConnection('white');
+
+    if (withVideo) {
+      // Then try to establish a video call.
+      call = peer.call(window.joinPeer.value.trim(), localStream);
+      onCall();
+    }
+  });
+}
 // Set up WebRTC-based P2P game.
 async function setupRtc() {
   if (withVideo) {
@@ -148,24 +170,33 @@ async function setupRtc() {
 
     // Attach the local stream to the "me" video.
     window.me.srcObject = localStream;
-
-    window.videoContainer.classList.add('show');
   }
-
-  // Hide the P2P button and show the P2P components.
-  window.remoteButton.classList.remove('show');
-  window.p2pContainer.classList.add('show');
-  window.idContainer.classList.add('show');
 
   // Connect to PeerJS.
   window.myId.value = '(connecting...)';
   window.myId.disabled = true;
 
-  peer = new Peer(generateRandomId());
+  if (tableId) {
+    window.tableStatus.textContent = 'Connecting...';
+    window.tableStatus.classList.add('show');
+    registerWithPeerJs('othello-table-' + tableId, 0);
+  } else {
+    registerWithPeerJs(generateRandomId());
+  }
+}
+
+function registerWithPeerJs(id, counter) {
+  peer = new Peer(counter ? id + '-' + counter : id);
   peer.on('open', () => {
     // When we know our own ID, fill in that part of the UI.
     window.myId.value = peer.id;
     window.myId.disabled = false;
+
+    if (tableId && counter) {
+      connectToPeer(id);
+    } else {
+      window.tableStatus.textContent = 'Waiting for opponent...';
+    }
   });
 
   peer.on('call', (callArg) => {
@@ -186,11 +217,19 @@ async function setupRtc() {
     // If an error occurs, log it and show an error message.
     console.log('PEER ERROR', error);
 
-    window.joinPeer.value = '(ERROR!)';
-    setTimeout(() => {
-      window.joinPeer.value = '';
-      window.joinPeer.disabled = false;
-    }, 5000);
+    // FIXME: Support for game observers
+    if (tableId && error.type == 'unavailable-id' && counter < 1) {
+      setTimeout(() => {
+        registerWithPeerJs(id, counter + 1);
+      }, 1000);
+    } else {
+      window.tableStatus.textContent = 'Table full?';
+      window.joinPeer.value = '(ERROR!)';
+      setTimeout(() => {
+        window.joinPeer.value = '';
+        window.joinPeer.disabled = false;
+      }, 5000);
+    }
   });
 }
 
@@ -704,6 +743,7 @@ function onClick(event) {
 function onConnection(color) {
   myColor = color;
   remoteGame = true;
+  window.tableStatus.textContent = 'Connected';
 
   // Start a new game, erasing whatever local play happened before this.
   resetGame();
@@ -721,6 +761,7 @@ function onConnection(color) {
       scoreElements[color].container.classList.remove('tie');
     }
     scoreElements[oppositeColor(myColor)].container.classList.add('bailed');
+    window.tableStatus.textContent = 'Disconnected';
 
     // Mark the game as over, and remove all "valid move" indicators.
     gameOver = true;
@@ -729,8 +770,10 @@ function onConnection(color) {
     window.joinPeer.disabled = false;
   });
 
-  // When connected, hide the P2P IDs, which we don't need any more.
-  window.idContainer.classList.remove('show');
+  if (withVideo) {
+    // When connected, hide the P2P IDs, which we don't need any more.
+    window.idContainer.classList.remove('show');
+  }
 }
 
 function onCall() {

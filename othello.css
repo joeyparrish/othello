@@ -63,6 +63,12 @@ button {
   padding: 0 3.5vmin;
 }
 
+#tableStatus {
+  /* Same size as the buttons. */
+  height: 7vmin;
+  font-size: 4.5vmin;
+}
+
 label,
 input[type=text] {
   /* Text inputs and their labels should have the same font size. */
@@ -242,7 +248,8 @@ input[type=text] {
 
 /* The buttons below the game board should be spaced apart a little. */
 #resetButton,
-#remoteButton {
+#remoteButton,
+#tableStatus {
   margin-top: 4vmin;
 }
 

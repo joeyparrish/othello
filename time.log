@@ -35,5 +35,6 @@
 6.25 hours = v1.1.0
 
 0.5 hour  - add own ID generator instead of relying on PeerJS
+1.0 hour  - add table ID support for pure URL-based joining
 ===========
-0.5 hours = v1.1.1
+1.5 hours = v1.2.0
