@@ -38,3 +38,5 @@
 1.0 hour  - add table ID support for pure URL-based joining
 ===========
 1.5 hours = v1.2.0
+
+0.5 hour  - partial observer support (no sharing of game state on join)

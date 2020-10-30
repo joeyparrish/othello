@@ -22,12 +22,17 @@ let remoteGame = false;
 let peer = null;
 // A PeerJS Connection object.
 let conn = null;
+// PeerJS Connections for game observers.
+const observers = [];
 // A PeerJS Call object.
 let call = null;
 // The color of the local player, either 'white' or 'black'.
 let myColor = null;
 // A MediaStream object for the local WebRTC feed.
 let localStream = null;
+
+// Neither white nor black, so it is never your turn if you're an observer.
+const OBSERVER_COLOR = 'blue';
 
 const urlParameters = new Map();
 if (location.search) {
@@ -54,7 +59,7 @@ function init() {
     if (remoteGame) {
       // In a P2P game, send a reset message over the data connection to the
       // peer.
-      conn.send({reset: true});
+      broadcast({reset: true});
     }
 
     resetGame();
@@ -132,17 +137,28 @@ function init() {
   }
 }
 
+function broadcast(data) {
+  conn.send(data);
+
+  // Forward this game event to all observers.
+  for (const observer of observers) {
+    if (observer.open) {
+      observer.send(data);
+    }
+  }
+}
+
 // Initiate a connection to a peer.  This is done you enter a friend's ID or
 // when using a table ID from the URL.
-function connectToPeer(peerId) {
+function connectToPeer(peerId, color) {
   conn = peer.connect(peerId);
 
   window.joinPeer.value = '(connecting...)';
   window.joinPeer.disabled = true;
 
   conn.on('open', () => {
-    // The local player will be 'white'.
-    onConnection('white');
+    // If we're calling someone else, we will play 'white'.
+    onConnection(color || 'white');
 
     if (withVideo) {
       // Then try to establish a video call.
@@ -193,7 +209,12 @@ function registerWithPeerJs(id, counter) {
     window.myId.disabled = false;
 
     if (tableId && counter) {
-      connectToPeer(id);
+      if (counter > 1) {
+        connectToPeer(id, OBSERVER_COLOR);  // So it's never your turn
+        window.resetButton.classList.add('hide');
+      } else {
+        connectToPeer(id);
+      }
     } else {
       window.tableStatus.textContent = 'Waiting for opponent...';
     }
@@ -207,18 +228,23 @@ function registerWithPeerJs(id, counter) {
   });
 
   peer.on('connection', (connArg) => {
-    // When a data connection comes in, answer it and assign the other player
+    // When a data connection comes in, answer it and assign the first player
     // to 'black'.
-    conn = connArg;
-    onConnection('black');
+    if (!conn || !conn.open) {
+      conn = connArg;
+      onConnection('black');
+      // FIXME: Send current game state to opponent
+    } else {
+      observers.push(connArg);
+      // FIXME: Send current game state to observers
+    }
   });
 
   peer.on('error', (error) => {
     // If an error occurs, log it and show an error message.
     console.log('PEER ERROR', error);
 
-    // FIXME: Support for game observers
-    if (tableId && error.type == 'unavailable-id' && counter < 1) {
+    if (tableId && error.type == 'unavailable-id' && counter < 10) {
       setTimeout(() => {
         registerWithPeerJs(id, counter + 1);
       }, 1000);
@@ -518,7 +544,7 @@ function markValidMoves() {
     if (remoteGame) {
       // In a P2P game, send a message over the data connection that you've
       // passed.
-      conn.send({pass: true});
+      broadcast({pass: true});
     }
 
     passCount++;
@@ -670,7 +696,7 @@ function playStone(x, y, color) {
   // In a P2P game, for your own plays, send info about this play over the data
   // connection to your peer.
   if (remoteGame && color == myColor) {
-    conn.send({x, y, color});
+    broadcast({x, y, color});
   }
 
   // Place the stone by adding the relevant color class.
@@ -743,10 +769,12 @@ function onClick(event) {
 function onConnection(color) {
   myColor = color;
   remoteGame = true;
-  window.tableStatus.textContent = 'Connected';
 
-  // Start a new game, erasing whatever local play happened before this.
-  resetGame();
+  if (color == OBSERVER_COLOR) {
+    window.tableStatus.textContent = 'Connected (observer)';
+  } else {
+    window.tableStatus.textContent = 'Connected';
+  }
 
   window.joinPeer.value = conn.peer;
   window.joinPeer.disabled = true;
@@ -787,6 +815,13 @@ function onCall() {
 // Called when a data message comes from the remote peer in a P2P game.
 function onRemoteData(data) {
   console.log('remote data', data);
+
+  // Forward this incoming game event to all observers.
+  for (const observer of observers) {
+    if (observer.open) {
+      observer.send(data);
+    }
+  }
 
   // The peer clicked the "reset" button.
   if (data.reset) {

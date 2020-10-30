@@ -89,6 +89,10 @@ input[type=text] {
   display: none !important;
 }
 
+.hide {
+  display: none;
+}
+
 
 /* =======================
  * Ribbons in the corners.
