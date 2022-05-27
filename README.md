@@ -6,21 +6,21 @@ Can be played locally or remotely (peer-to-peer) with video chat.
 
 Works offline and as a Progressive Web App (PWA).
 
-https://cashpipeplusplus.github.io/othello/
+https://joeyparrish.github.io/othello/
 
 ## Documentation
 
-https://cashpipeplusplus.github.io/othello/how-do-i-play.html
+https://joeyparrish.github.io/othello/how-do-i-play.html
 
 ## Privacy Policy
 
-https://cashpipeplusplus.github.io/othello/privacy-policy.html
+https://joeyparrish.github.io/othello/privacy-policy.html
 
 ## Browser Support
 
 This probably won't work on IE.  It should work on any current browser.
 If it doesn't work for you, please file a new issue here:
-https://github.com/cashpipeplusplus/othello/issues
+https://github.com/joeyparrish/othello/issues
 
 ## License
 
