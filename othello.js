@@ -516,153 +516,8 @@ function resetGame() {
     markValidMoves();
 }
 
-// Javascript program to demonstrate
-// working of Alpha-Beta Pruning
-
-// Initial values of
-// Alpha and Beta
-let MAX = 1000;
-let MIN = -1000;
-
-let gameTree = []
-
-// Returns optimal value for
-// current player (Initially called
-// for root and maximizer)
-function minimax(depth,nodeIndex,maximizingPlayer,values,alpha,beta)
-{
-    // Terminating condition. i.e
-    // leaf node is reached
-    if (depth == 3)
-        return values[nodeIndex];
-
-    if (maximizingPlayer)
-    {
-        let best = MIN;
-
-        // Recur for left and
-        // right children
-        for (let i = 0; i < 2; i++)
-        {
-            let val = minimax(depth + 1, nodeIndex * 2 + i,
-                false, values, alpha, beta);
-            best = Math.max(best, val);
-            alpha = Math.max(alpha, best);
-
-            // Alpha Beta Pruning
-            if (beta <= alpha)
-                break;
-        }
-        return best;
-    }
-    else
-    {
-        let best = MAX;
-
-        // Recur for left and
-        // right children
-        for (let i = 0; i < 2; i++)
-        {
-
-            let val = minimax(depth + 1, nodeIndex * 2 + i,
-                true, values, alpha, beta);
-            best = Math.min(best, val);
-            beta = Math.min(beta, best);
-
-            // Alpha Beta Pruning
-            if (beta <= alpha)
-                break;
-        }
-        return best;
-    }
-}
-
-var myTurn = true;
-var firstTurn = true;
-
 // This code is contributed by rag2127
 
-function generateTree(depth, currentState) {
-    var tree = [];
-
-    for (var i = 0; i < depth; i++) {
-        getValidMoves()
-    }
-}
-
-function getValidMovesFromState() {
-
-}
-
-function markValidMoves() {
-    // If the game is over, don't do anything.
-    if (gameOver) {
-        return;
-    }
-
-    // If we're showing someone must pass, don't do anything.
-    if (passTimerId != null) {
-        return;
-    }
-
-    // If someone is out of pieces, the game is over.
-    if (window.gameBoard.querySelector('.black') == null || window.gameBoard.querySelector('.white') == null) {
-        endGame();
-        return;
-    }
-
-    // If both players had to pass, nobody can move and the game is over.
-    if (passCount >= 2) {
-        endGame();
-        return;
-    }
-
-    // In a P2P game, don't show the valid move indicators when it's the other
-    // player's turn.
-    if (remoteGame && turn != myColor) {
-        unmarkValidMoves();
-        return;
-    }
-
-    var currentState = [];
-    var index = 0;
-
-    // Find and mark all the valid moves in the game board.
-    for (let y = 0; y < 8; ++y) {
-        for (let x = 0; x < 8; ++x) {
-            currentState[index] = 0;
-
-            if (isValidPlay(x, y, turn)) {
-                grid[y][x].classList.add('valid');
-
-                if (grid[y][x].classList.contains("white")) {
-                    currentState[index] = 1;
-                }
-            }
-            index++;
-        }
-    }
-
-    console.log(currentState);
-
-    let values=[3, 5, 6, 9, 1, 2, 0, -1];
-    //document.write("The optimal value is : " +
-    //    minimax(0, 0, true, values, MIN, MAX));
-
-    // If there are no valid moves, then the current player must pass.
-    if (window.gameBoard.querySelector('.valid') == null) {
-        if (remoteGame) {
-            // In a P2P game, send a message over the data connection that you've
-            // passed.
-            broadcast({pass: true});
-        }
-
-        passCount++;
-        onPass();
-    } else {
-        passCount = 0;
-    }
-}
 
 // Signal when a user must pass.
 function onPass() {
@@ -698,14 +553,41 @@ function unmarkValidMoves() {
     }
 }
 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
 // Set state for the next player's turn.
-function nextTurn() {
+async function nextTurn() {
     unmarkValidMoves();
     scoreElements[turn].container.classList.remove('turn');
     turn = oppositeColor(turn);
     scoreElements[turn].container.classList.add('turn');
 
-    myTurn = !myTurn;
+    console.log(turn);
+
+    if (turn === "white") {
+
+        markValidMoves();
+
+        console.log("Playing AI move...");
+
+        await sleep(1000);
+
+        var simplifiedBoard = getSimplifiedBoard(grid);
+
+        var playTree = createTree(simplifiedBoard, 3);
+
+        var bestMove = findBestMove(playTree, 3);
+
+        console.log("AI wants to play move: " + bestMove.move[0] + " " + bestMove.move[1]);
+
+        playStone(bestMove.move[1], bestMove.move[0], "white");
+        takeScore();
+        nextTurn();
+    }
+
 }
 
 // A generator that yields board squares starting at x,y and moving in the
@@ -1061,4 +943,391 @@ function generateRandomId() {
         idParts.push(partString);
     }
     return idParts.join('-');
+}
+
+function getSimplifiedBoard(currentGrid) {
+
+    var copiedGrid = new Array(8);
+
+    for (var i = 0; i < 8; i++) {
+        copiedGrid[i] = new Array(8);
+    }
+
+    for (let i = 0; i < 8; i++) {
+        for (let j = 0; j < 8; j++) {
+            var element = currentGrid[i][j];
+            if (element.classList.contains("black")) {
+                copiedGrid[i][j] = "X";
+            } else if (element.classList.contains("white")) {
+                copiedGrid[i][j] = "O"
+            } else {
+                copiedGrid[i][j] = "-";
+            }
+        }
+    }
+
+    return copiedGrid;
+
+}
+
+function markValidMoves() {
+    // If the game is over, don't do anything.
+    if (gameOver) {
+        return;
+    }
+
+    // If we're showing someone must pass, don't do anything.
+    if (passTimerId != null) {
+        return;
+    }
+
+    // If someone is out of pieces, the game is over.
+    if (window.gameBoard.querySelector('.black') == null || window.gameBoard.querySelector('.white') == null) {
+        endGame();
+        return;
+    }
+
+    // If both players had to pass, nobody can move and the game is over.
+    if (passCount >= 2) {
+        endGame();
+        return;
+    }
+
+    // In a P2P game, don't show the valid move indicators when it's the other
+    // player's turn.
+    if (remoteGame && turn != myColor) {
+        unmarkValidMoves();
+        return;
+    }
+
+    // Find and mark all the valid moves in the game board.
+    for (let y = 0; y < 8; ++y) {
+        for (let x = 0; x < 8; ++x) {
+            if (isValidPlay(x, y, turn)) {
+                grid[y][x].classList.add('valid');
+            }
+        }
+    }
+
+    // If there are no valid moves, then the current player must pass.
+    if (window.gameBoard.querySelector('.valid') == null) {
+        if (remoteGame) {
+            // In a P2P game, send a message over the data connection that you've
+            // passed.
+            broadcast({pass: true});
+        }
+
+        passCount++;
+        onPass();
+    } else {
+        passCount = 0;
+    }
+}
+
+var advancedAIMode = true;
+
+class Node {
+    constructor(board) {
+        this.board = board;
+        this.totalScore = score(board);
+
+        if (!advancedAIMode) {
+            this.boardScore = this.totalScore["O"] - this.totalScore["X"];
+        } else {
+            this.boardScore = evaluateBoard(board, "O");
+        }
+
+        this.move = null;
+        this.children = [];
+    }
+}
+
+function createTree(rootValue, maxDepth, currentDepth = 0) {
+    if (currentDepth >= maxDepth) {
+        return null;
+    }
+
+    let rootNode = new Node(rootValue);
+
+    var fetchedPossibleMoves = findPossibleMoves(rootNode.board, "O");
+
+    fetchedPossibleMoves.forEach(function(move) {
+        var newBoard = returnBoardWithPlayedMove(rootNode.board, move, "O");
+
+        let childNode = createTree(newBoard, maxDepth, currentDepth + 1);
+
+        if (childNode !== null) {
+
+            childNode.move = move;
+
+            rootNode.children.push(childNode);
+
+        }
+    })
+
+    return rootNode;
+}
+
+
+function findPossibleMoves(board, player) {
+    let possibleMoves = [];
+
+    // Iterate over all squares in the board
+    for (let i = 0; i < 8; i++) {
+        for (let j = 0; j < 8; j++) {
+            // If the square is empty, check if it's a valid move for the player
+            if (board[i][j] === '-') {
+                if (isValidMove(board, i, j, player)) {
+                    possibleMoves.push([i, j]);
+                }
+            }
+        }
+    }
+
+    return possibleMoves;
+}
+
+function isValidMove(board, row, col, player) {
+    // Check if the move is valid in any of the eight directions
+    for (let dRow = -1; dRow <= 1; dRow++) {
+        for (let dCol = -1; dCol <= 1; dCol++) {
+            if (dRow === 0 && dCol === 0) {
+                continue;
+            }
+            if (isValidDirection(board, row, col, player, dRow, dCol)) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+function isValidDirection(board, row, col, player, dRow, dCol) {
+    let opponent = (player === 'X') ? 'O' : 'X';
+
+    // Check if there is at least one opponent piece in the direction
+    let r = row + dRow;
+    let c = col + dCol;
+    let foundOpponent = false;
+    while (r >= 0 && r < 8 && c >= 0 && c < 8) {
+        if (board[r][c] === opponent) {
+            foundOpponent = true;
+            break;
+        }
+        if (board[r][c] === '-') {
+            break;
+        }
+        r += dRow;
+        c += dCol;
+    }
+
+    if (!foundOpponent) {
+        return false;
+    }
+
+    // Check if there is a player piece in the direction
+    r += dRow;
+    c += dCol;
+    while (r >= 0 && r < 8 && c >= 0 && c < 8) {
+        if (board[r][c] === player) {
+            return true;
+        }
+        if (board[r][c] === '-') {
+            break;
+        }
+        r += dRow;
+        c += dCol;
+    }
+
+    return false;
+}
+
+function evaluateBoard(board, player) {
+    let score = 0;
+    let opponent = player === 'X' ? 'O' : 'X';
+
+    // Count the number of pieces for each player
+    let playerPieces = 0;
+    let opponentPieces = 0;
+    for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+            if (board[row][col] === player) {
+                playerPieces++;
+            } else if (board[row][col] === opponent) {
+                opponentPieces++;
+            }
+        }
+    }
+
+    // Add the piece difference to the score
+    score += playerPieces - opponentPieces;
+
+    // Count the number of legal moves for each player
+    let playerMoves = findPossibleMoves(board, player).length;
+    let opponentMoves = findPossibleMoves(board, opponent).length;
+
+    // Add the move difference to the score
+    score += playerMoves - opponentMoves;
+
+    // Calculate the stability for each player
+    let playerStability = calculateStability(board, player);
+    let opponentStability = calculateStability(board, opponent);
+
+    // Add the stability difference to the score
+    score += playerStability - opponentStability;
+
+    return score;
+}
+
+function calculateStability(board, player) {
+    let stability = 0;
+    let opponent = player === 'X' ? 'O' : 'X';
+
+    // Check the stability of each piece
+    for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+            if (board[row][col] === player) {
+                let stable = true;
+                // Check stability in all 8 directions
+                for (let dx = -1; dx <= 1; dx++) {
+                    for (let dy = -1; dy <= 1; dy++) {
+                        if (dx === 0 && dy === 0) {
+                            continue;
+                        }
+                        let x = row + dx;
+                        let y = col + dy;
+                        let consecutiveOpponents = 0;
+                        while (x >= 0 && x < 8 && y >= 0 && y < 8) {
+                            if (board[x][y] === opponent) {
+                                consecutiveOpponents++;
+                            } else if (board[x][y] === player) {
+                                if (consecutiveOpponents > 0) {
+                                    // This piece is stable in this direction
+                                    stable = false;
+                                    break;
+                                }
+                            } else {
+                                // This is an empty square
+                                break;
+                            }
+                            x += dx;
+                            y += dy;
+                        }
+                        if (!stable) {
+                            break;
+                        }
+                    }
+                    if (!stable) {
+                        break;
+                    }
+                }
+                if (stable) {
+                    stability++;
+                }
+            }
+        }
+    }
+
+    return stability;
+}
+
+function score(board) {
+    let scores = {
+        'X': 0,
+        'O': 0
+    };
+
+    for (let i = 0; i < board.length; i++) {
+        for (let j = 0; j < board[i].length; j++) {
+            if (board[i][j] === 'X') {
+                scores['X'] += 1;
+            } else if (board[i][j] === 'O') {
+                scores['O'] += 1;
+            }
+        }
+    }
+
+    return scores;
+}
+
+function returnBoardWithPlayedMove(board, movePos, player) {
+    let opponent = player === 'X' ? 'O' : 'X';
+    let newBoard = board.map(function(arr) {
+        return [...arr];
+    });
+
+    // Place the player's piece at the specified location
+    newBoard[movePos[0]][movePos[1]] = player;
+
+    // Check all 8 directions for pieces to flip
+    for (let dx = -1; dx <= 1; dx++) {
+        for (let dy = -1; dy <= 1; dy++) {
+            if (dx === 0 && dy === 0) {
+                continue;
+            }
+            let i = movePos[0] + dx;
+            let j = movePos[1] + dy;
+            let flipped = false;
+            let flippedPositions = [];
+            while (i >= 0 && i < 8 && j >= 0 && j < 8) {
+                if (newBoard[i][j] === opponent) {
+                    flippedPositions.push([i, j]); // keep track of the positions of flipped pieces
+                    i += dx;
+                    j += dy;
+                } else if (newBoard[i][j] === player) {
+                    // Found a line of opponent pieces that can be flipped
+                    flipped = true;
+                    break;
+                } else {
+                    // Found an empty square
+                    break;
+                }
+            }
+            if (flipped) {
+                // Flip all pieces in the line
+                for (let k = 0; k < flippedPositions.length; k++) {
+                    let [xFlip, yFlip] = flippedPositions[k];
+                    newBoard[xFlip][yFlip] = player;
+                }
+            }
+        }
+    }
+
+    return newBoard;
+}
+
+function minimax(node, depth, isMaximizingPlayer) {
+    if (depth === 0 || node.children.length === 0) {
+        return node.boardScore;
+    }
+
+    if (isMaximizingPlayer) {
+        let bestScore = -Infinity;
+        for (let i = 0; i < node.children.length; i++) {
+            let childScore = minimax(node.children[i], depth - 1, false);
+            bestScore = Math.max(bestScore, childScore);
+        }
+        return bestScore;
+    } else {
+        let bestScore = Infinity;
+        for (let i = 0; i < node.children.length; i++) {
+            let childScore = minimax(node.children[i], depth - 1, true);
+            bestScore = Math.min(bestScore, childScore);
+        }
+        return bestScore;
+    }
+}
+
+function findBestMove(node, depth) {
+    let bestScore = -Infinity;
+    let bestMoveIndex = -1;
+    for (let i = 0; i < node.children.length; i++) {
+        let childScore = minimax(node.children[i], depth - 1, false);
+        if (childScore > bestScore) {
+            bestScore = childScore;
+            bestMoveIndex = i;
+        }
+    }
+    return node.children[bestMoveIndex];
 }
