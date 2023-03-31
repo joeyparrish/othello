@@ -35,7 +35,7 @@
         <div id="gameBoard"></div>
 
         <form>
-          <input type="checkbox" id="difficulty" name="difficulty" onchange="(function(event){console.log(event)})()"/>
+          <input type="checkbox" id="difficulty" name="difficulty" onchange="advancedAIMode = document.getElementById('difficulty').checked"/>
           <label for="difficulty">Advanced AI?</label>
         </form>
         <button id="resetButton">Reset Game</button>

@@ -559,7 +559,7 @@ function sleep(ms) {
 
 
 // Set state for the next player's turn.
-function nextTurn() {
+async function nextTurn() {
     unmarkValidMoves();
     scoreElements[turn].container.classList.remove('turn');
     turn = oppositeColor(turn);
@@ -573,22 +573,22 @@ function nextTurn() {
 
         console.log("Playing AI move...");
 
-        //await sleep(1000);
+        await sleep(1000);
 
         var simplifiedBoard = getSimplifiedBoard(grid);
 
-        var playTree = createTreeAB(simplifiedBoard, 3, 0, true);
-        //createTree(simplifiedBoard, 3);
-        console.log(playTree);
+        var playTree = createTreeAB(simplifiedBoard, 5, 0, true);
 
-        let rootNode = new Node(simplifiedBoard);
-        rootNode.root = true;
-
-        var bestMove = minimax(rootNode, 3, true);
-
-        //var bestMove = alphaBetaPruning(simplifiedBoard, 3, null, null, false);
-
-        console.log(bestMove)
+        var bestMove = null;
+        for (var node of playTree.children) {
+            if (bestMove == null) {
+                bestMove = node;
+            } else {
+                if (node.boardScore > bestMove.boardScore) {
+                    bestMove = node;
+                }
+            }
+        }
 
         console.log("AI wants to play move: " + bestMove.move[0] + " " + bestMove.move[1]);
 
@@ -1033,7 +1033,7 @@ function markValidMoves() {
     }
 }
 
-var advancedAIMode = true;
+var advancedAIMode = false;
 
 
 function findPossibleMoves(board, player) {
@@ -1277,92 +1277,13 @@ class Node {
             }
 
         }
-
         this.move = null;
         this.children = [];
-        this.bestMove = false;
     }
-}
-
-
-
-function alphaBetaPruning(state, depth, alpha, beta, maximizingPlayer) {
-    if (depth === 0) {
-        return state;
-    }
-
-    let rootNode = new Node(state);
-
-    var fetchedPossibleMoves = findPossibleMoves(state.board, "O");
-
-    if (maximizingPlayer) {
-
-        let maxState = null;
-        //let maxScore = -Infinity;
-
-
-        for (let move of fetchedPossibleMoves) {
-            let newState = returnBoardWithPlayedMove(state.board, move, "O");
-
-            let score = alphaBetaPruning(newState, depth - 1, alpha, beta, false);
-
-            if (maxState !== null) {
-                maxState = Math.max(maxState.boardScore, score.boardScore);
-            } else {
-                maxState = score
-            }
-
-            if (alpha)
-            alpha = Math.max(alpha.boardScore, score.boardScore);
-            if (beta <= alpha) {
-                break;
-            }
-        }
-        return maxScore;
-    } else {
-        let minScore = Infinity;
-        for (let move of fetchedPossibleMoves) {
-            let newState = returnBoardWithPlayedMove(state, move, "O");
-            let score = alphaBetaPruning(newState, depth - 1, alpha, beta, true);
-            minScore = Math.min(minScore, score.boardScore);
-            beta = Math.min(beta, score.boardScore);
-            if (beta <= alpha) {
-                break;
-            }
-        }
-        return minScore;
-    }
-}
-
-function createTree(rootValue, maxDepth, currentDepth = 0) {
-    if (currentDepth >= maxDepth) {
-        return null;
-    }
-
-    let rootNode = new Node(rootValue); // This would be returned
-
-    var fetchedPossibleMoves = findPossibleMoves(rootNode.board, "O");
-
-    fetchedPossibleMoves.forEach(function(move) {
-        var newBoard = returnBoardWithPlayedMove(rootNode.board, move, "O");
-        console.log(move)
-
-        let childNode = createTree(newBoard, maxDepth, currentDepth + 1);
-
-        if (childNode !== null) {
-
-            childNode.move = move;
-
-            rootNode.children.push(childNode);
-
-        }
-    })
-
-    return rootNode;
 }
 
 function createTreeAB(rootValue, maxDepth, currentDepth = 0, maximizingPlayer, alpha, beta) {
-    if (currentDepth >= maxDepth) { // If we reached terminal depth
+    if (currentDepth >= maxDepth) {
         return null;
     }
 
@@ -1372,128 +1293,63 @@ function createTreeAB(rootValue, maxDepth, currentDepth = 0, maximizingPlayer, a
         beta = new Node();
         beta.boardScore = Infinity;
 
-        //console.log(alpha, beta)
     }
 
-    let rootNode = new Node(rootValue); // This would be returned (or generated for each call)
+    let rootNode = new Node(rootValue);
+    let fetchedPossibleMoves = findPossibleMoves(rootNode.board, maximizingPlayer ? "O" : "X");
 
-    var fetchedPossibleMoves = findPossibleMoves(rootNode.board, "O");
-
-    if (maximizingPlayer) { // Maximizing player
-
-        let maxScore = -Infinity;
+    if (maximizingPlayer) {
+        let maxScore = new Node();
+        maxScore.boardScore = -Infinity;
 
         for (let i = 0; i < fetchedPossibleMoves.length; i++) {
-            var newBoard = returnBoardWithPlayedMove(rootNode.board, fetchedPossibleMoves[i], "O");
-
+            let newBoard = returnBoardWithPlayedMove(rootNode.board, fetchedPossibleMoves[i], "O");
             let childNode = createTreeAB(newBoard, maxDepth, currentDepth + 1, false, alpha, beta);
 
             if (childNode !== null) {
                 childNode.move = fetchedPossibleMoves[i];
-                rootNode.children.push(childNode); // Add children node
 
-                if (childNode.boardScore > maxScore.boardScore) {
+                rootNode.children.push(childNode);
+
+                if (maxScore.boardScore < childNode.boardScore) {
                     maxScore = childNode;
                 }
-                if (childNode.boardScore > alpha.boardScore) {
-                    alpha = childNode;
+                if (alpha.boardScore < maxScore) {
+                    alpha = maxScore;
                 }
 
                 if (beta.boardScore <= alpha.boardScore) {
                     break;
                 }
-
             }
         }
-    } else { // Minimizing player
 
-        let minScore = Infinity;
+        return rootNode;
+    } else {
+        let minScore = new Node();
+        minScore.boardScore = Infinity;
 
         for (let i = 0; i < fetchedPossibleMoves.length; i++) {
-            var newBoard = returnBoardWithPlayedMove(rootNode.board, fetchedPossibleMoves[i], "O");
-
+            let newBoard = returnBoardWithPlayedMove(rootNode.board, fetchedPossibleMoves[i], "X");
             let childNode = createTreeAB(newBoard, maxDepth, currentDepth + 1, true, alpha, beta);
 
             if (childNode !== null) {
                 childNode.move = fetchedPossibleMoves[i];
-                rootNode.children.push(childNode); // Add children node
+                rootNode.children.push(childNode);
 
                 if (childNode.boardScore < minScore.boardScore) {
                     minScore = childNode;
                 }
-                if (childNode.boardScore < beta.boardScore) {
-                    beta = childNode;
+                if (minScore.boardScore < beta.boardScore) {
+                    beta = minScore;
                 }
 
                 if (beta.boardScore <= alpha.boardScore) {
                     break;
                 }
-
-            }
-            return childNode;
-        }
-    }
-
-    return rootNode;
-}
-
-function minimax(node, depth, isMaximizingPlayer) {
-    if (depth === 0 || node.children.length === 0) {
-        return node;
-    }
-
-    let possibleMoves = findPossibleMoves(node.board, "O")
-
-    for (let move of possibleMoves) {
-        var childNode = new Node(returnBoardWithPlayedMove(node.board, move, "O"));
-        childNode.move = move;
-        node.children.append(childNode);
-        console.log(node, depth);
-    }
-
-    if (isMaximizingPlayer) {
-        let bestScore = -Infinity;
-        let bestScoreObj = null;
-
-        for (let i = 0; i < node.children.length; i++) {
-            let childScore = minimax(node.children[i], depth - 1, false);
-
-            if (childScore.boardScore > bestScore) {
-                bestScore = childScore.boardScore;
-                bestScoreObj = childScore;
             }
         }
 
-        return bestScoreObj;
-    } else {
-        let bestScore = Infinity;
-        let bestScoreObj = null;
-
-        for (let i = 0; i < node.children.length; i++) {
-            let childScore = minimax(node.children[i], depth - 1, true);
-
-            if (childScore.boardScore < bestScore) {
-                bestScore = childScore.boardScore;
-                bestScoreObj = childScore;
-            }
-
-        }
-        return bestScoreObj;
+        return rootNode;
     }
-}
-
-function findBestMove(node, depth) {
-    let bestScore = -Infinity;
-    let bestMoveIndex = -1;
-    for (let i = 0; i < node.children.length; i++) {
-
-        let childScore = minimax(node.children[i], depth - 1, false);
-
-        if (childScore > bestScore) {
-            bestScore = childScore;
-            bestMoveIndex = i;
-        }
-
-    }
-    return node.children[bestMoveIndex];
 }

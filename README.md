@@ -1,5 +1,13 @@
 # Othello
 
+UI was originally created by joeyparrish on GitHub.
+
+I modified it to include the AI-playing agent that can beat you every time.
+
+To run, just open index.html in your browser. You have an option to enable the "Advanced AI"
+
+This uses a more sophisticated evaluation function that will be you every time even quicker than before.
+
 Multi-player, browser-based, server-less Othello.
 
 Can be played locally or remotely (peer-to-peer) with video chat.
