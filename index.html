@@ -33,6 +33,11 @@
       <div id="gameContainer">
         <div id="scoreBoard"></div>
         <div id="gameBoard"></div>
+
+        <form>
+          <input type="checkbox" id="difficulty" name="difficulty" onchange="advancedAIMode = document.getElementById('difficulty').checked"/>
+          <label for="difficulty">Advanced AI?</label>
+        </form>
         <button id="resetButton">Reset Game</button>
         <button id="remoteButton"
                 class="hide-by-default">P2P Multi-player</button>
